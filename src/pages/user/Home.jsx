@@ -1,35 +1,3 @@
-// import { Link } from 'react-router-dom'
-
-// export default function Home() {
-//   return (
-//     <div className="container">
-//       <section className="hero">
-//         <h1>Booking Layanan Jadi Mudah</h1>
-//         <p>
-//           Pilih layanan barbershop &amp; salon favorit Anda, tentukan jadwal,
-//           dan booking dalam hitungan detik. Tanpa antre, tanpa ribet.
-//         </p>
-//         <Link to="/services" className="btn btn-primary btn-lg">Lihat Layanan</Link>
-//       </section>
-
-//       <section className="features">
-//         <div className="card feature-card">
-//           <h3>Pilih Layanan</h3>
-//           <p>Beragam layanan dari potong rambut hingga perawatan lengkap.</p>
-//         </div>
-//         <div className="card feature-card">
-//           <h3>Atur Jadwal</h3>
-//           <p>Lihat slot tersedia secara real-time dan pilih jam yang pas.</p>
-//         </div>
-//         <div className="card feature-card">
-//           <h3>Bayar Fleksibel</h3>
-//           <p>Transfer, cash, atau e-wallet — semua bisa.</p>
-//         </div>
-//       </section>
-//     </div>
-//   )
-// }
-
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 

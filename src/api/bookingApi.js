@@ -40,10 +40,13 @@ export const updateService = (id, payload) =>
 export const deleteService = (id) => client.delete(`/services/${id}`);
 
 // ===== Admin: Schedules =====
-export const getAllSchedules = () => client.get("/schedules");
+// export const getAllSchedules = () => client.get("/schedules");
+export const getAllSchedules = (params) => client.get("/schedules", { params });
 export const createSchedule = (payload) => client.post("/schedules", payload);
 export const setScheduleAvailability = (id, isAvailable) =>
   client.patch(`/schedules/${id}/availability`, { is_active: isAvailable });
+export const updateSchedule = (id, payload) =>
+  client.put(`/schedules/${id}`, payload); // <-- tambahkan ini
 
 // ===== Admin: Reports =====
 export const getReportSummary = () => client.get("/reports/summary");
