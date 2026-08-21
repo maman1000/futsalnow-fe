@@ -43,7 +43,7 @@ export const deleteService = (id) => client.delete(`/services/${id}`);
 export const getAllSchedules = () => client.get("/schedules");
 export const createSchedule = (payload) => client.post("/schedules", payload);
 export const setScheduleAvailability = (id, isAvailable) =>
-  client.patch(`/schedules/${id}/availability`, { is_available: isAvailable });
+  client.patch(`/schedules/${id}/availability`, { is_active: isAvailable });
 
 // ===== Admin: Reports =====
 export const getReportSummary = () => client.get("/reports/summary");
