@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
 
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -18,14 +20,17 @@ export default function Login() {
       const user = await login(email, password);
       navigate(user.role === "admin" ? "/admin" : "/");
     } catch (err) {
-      setError(err.response?.data?.message || "Login gagal. Coba lagi.");
+      // setError(err.response?.data?.message || "Login gagal. Coba lagi.");
+      const msg = err.response?.data?.message || "Login gagal. Coba lagi.";
+      // setError(msg);
+      showToast(msg, "error");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="auth-page">
+    <div className="page-content auth-page">
       <div className="auth-card">
         <div className="auth-header">
           <span className="auth-icon">🔐</span>

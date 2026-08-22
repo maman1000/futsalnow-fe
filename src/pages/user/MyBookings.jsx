@@ -124,7 +124,7 @@ export default function MyBookings() {
   };
 
   return (
-    <div className="my-bookings-page">
+    <div className="page-content my-bookings-page">
       <div className="my-bookings-header">
         <h1 className="my-bookings-title">📋 Booking Saya</h1>
         <p className="my-bookings-subtitle">

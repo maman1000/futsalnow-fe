@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
 
 export default function Register() {
   const { register } = useAuth();
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -29,16 +31,19 @@ export default function Register() {
       const firstFieldError = data?.errors
         ? Object.values(data.errors)[0]?.[0]
         : null;
-      setError(
-        firstFieldError || data?.message || "Registrasi gagal. Coba lagi.",
-      );
+      // setError(
+      //   firstFieldError || data?.message || "Registrasi gagal. Coba lagi.",
+      // );
+      const msg =
+        firstFieldError || data?.message || "Registrasi gagal. Coba lagi.";
+      showToast(msg, "error"); // <-- TAMBAHKAN
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="auth-page">
+    <div className="page-content auth-page">
       <div className="auth-card">
         <div className="auth-header">
           <span className="auth-icon">✨</span>

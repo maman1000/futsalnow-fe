@@ -139,7 +139,7 @@ export default function ManageServices() {
   };
 
   return (
-    <div className="manage-services-page">
+    <div className="page-content manage-services-page">
       <div className="page-header">
         <h1 className="page-title">⚽ Kelola Lapangan Futsal</h1>
         <p className="page-subtitle">

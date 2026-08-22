@@ -55,7 +55,7 @@ export default function Reports() {
     .reduce((sum, b) => sum + Number(b.total_price || 0), 0);
 
   return (
-    <div className="reports-page">
+    <div className="page-content reports-page">
       <div className="page-header">
         <h1 className="page-title">📊 Laporan Booking</h1>
         <p className="page-subtitle">

@@ -40,7 +40,7 @@ export default function BookingPage() {
   // Tampilkan loading
   if (loading) {
     return (
-      <div className="container">
+      <div className="page-content container">
         <div className="loading-spinner">
           <span className="spinner"></span>
           <p>Memuat data layanan...</p>
@@ -52,7 +52,7 @@ export default function BookingPage() {
   // Tampilkan error
   if (error) {
     return (
-      <div className="container">
+      <div className="page-content container">
         <div className="alert alert-error">{error}</div>
         <button
           className="btn btn-secondary"
@@ -68,7 +68,7 @@ export default function BookingPage() {
   // Jika service null (misal data kosong) tapi tidak ada error
   if (!service) {
     return (
-      <div className="container">
+      <div className="page-content container">
         <div className="alert alert-warning">Layanan tidak tersedia.</div>
         <button className="btn btn-secondary" onClick={() => navigate(-1)}>
           ← Kembali
@@ -78,7 +78,7 @@ export default function BookingPage() {
   }
 
   return (
-    <div className="container">
+    <div className="page-content container">
       <div className="page-header">
         <h2>Booking: {service.name}</h2>
         <p className="muted">{formatRupiah(service.price_per_hour)} / jam</p>

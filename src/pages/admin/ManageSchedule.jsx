@@ -39,30 +39,6 @@ export default function ManageSchedule() {
   });
   const [currentPage, setCurrentPage] = useState(1);
 
-  // const fetchData = useCallback(async () => {
-  //   try {
-  //     const [resServices, resSchedules] = await Promise.all([
-  //       getServices(),
-  //       getAllSchedules(),
-  //     ]);
-  //     setServices(
-  //       Array.isArray(resServices.data)
-  //         ? resServices.data
-  //         : resServices.data?.data || [],
-  //     );
-  //     setSchedules(
-  //       Array.isArray(resSchedules.data)
-  //         ? resSchedules.data
-  //         : resSchedules.data?.data || [],
-  //     );
-  //   } catch (err) {
-  //     console.error("FETCH SCHEDULE ERROR:", err);
-  //     setError(err.response?.data?.message || "Gagal memuat data jadwal.");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // }, []);
-
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
@@ -138,10 +114,6 @@ export default function ManageSchedule() {
     }
   };
 
-  // const filtered = filterService
-  //   ? schedules.filter((s) => String(s.service_id) === filterService)
-  //   : schedules;
-
   const openEditModal = (schedule) => {
     setEditingSchedule(schedule);
     setEditForm({
@@ -184,7 +156,7 @@ export default function ManageSchedule() {
   };
 
   return (
-    <div className="manage-schedule-page">
+    <div className="page-content manage-schedule-page">
       <div className="page-header">
         <h1 className="page-title">📅 Kelola Jadwal</h1>
         <p className="page-subtitle">

@@ -47,7 +47,7 @@ export default function Dashboard() {
   const byStatus = summary.bookings_by_status || {};
 
   return (
-    <div className="dashboard-page">
+    <div className="page-content dashboard-page">
       <div className="dashboard-header">
         <h1 className="dashboard-title">📊 Dashboard Admin</h1>
         <p className="dashboard-subtitle">

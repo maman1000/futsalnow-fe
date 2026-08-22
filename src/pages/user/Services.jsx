@@ -26,7 +26,7 @@ export default function Services() {
   }, []);
 
   return (
-    <div className="services-page">
+    <div className="page-content services-page">
       <div className="services-header">
         <h1 className="services-title">🏸 Pilih Lapangan Futsal</h1>
         <p className="services-subtitle">

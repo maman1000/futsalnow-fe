@@ -5,7 +5,7 @@ export default function Home() {
   const { user } = useAuth();
 
   return (
-    <div className="home-page">
+    <div className="page-content home-page">
       {/* HERO SECTION */}
       <section className="hero-section">
         <div className="hero-content">
@@ -31,8 +31,15 @@ export default function Home() {
             )}
           </div>
         </div>
-        <div className="hero-image">
+        {/* <div className="hero-image">
           <span className="hero-emoji">⚽</span>
+        </div> */}
+        <div className="hero-image">
+          <img
+            src="/images/futsal-hero.jpg"
+            alt="Ilustrasi Lapangan Futsal"
+            className="hero-illustration"
+          />
         </div>
       </section>
 

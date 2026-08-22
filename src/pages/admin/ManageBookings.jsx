@@ -92,7 +92,7 @@ export default function ManageBookings() {
   };
 
   return (
-    <div className="manage-bookings-page">
+    <div className="page-content manage-bookings-page">
       <div className="page-header">
         <h1 className="page-title">📋 Kelola Booking</h1>
         <p className="page-subtitle">
@@ -188,7 +188,7 @@ export default function ManageBookings() {
                   </div>
                 </div>
                 <div className="booking-actions">
-                  {b.status === "pending" && (
+                  {/* {b.status === "pending" && (
                     <>
                       <button
                         className="btn btn-complete"
@@ -203,6 +203,32 @@ export default function ManageBookings() {
                         Batalkan
                       </button>
                     </>
+                  )} */}
+                  {b.status === "pending" && (
+                    <>
+                      <button
+                        className="btn-confirm"
+                        onClick={() => handleUpdateStatus(b, "confirmed")}
+                      >
+                        ✅ Konfirmasi
+                      </button>
+                      <button
+                        className="btn-cancel"
+                        onClick={() => handleUpdateStatus(b, "canceled")}
+                      >
+                        ❌ Batalkan
+                      </button>
+                    </>
+                  )}
+
+                  {/* 👇 TAMBAHKAN INI */}
+                  {b.status === "confirmed" && (
+                    <button
+                      className="btn-complete"
+                      onClick={() => handleUpdateStatus(b, "completed")}
+                    >
+                      ✔️ Tandai Selesai
+                    </button>
                   )}
                 </div>
               </div>
@@ -577,6 +603,61 @@ export default function ManageBookings() {
             margin-top: 0.5rem;
             justify-content: flex-start;
           }
+        }
+
+        /* ===== Tombol Aksi di ManageBookings ===== */
+        .btn-confirm {
+          background: linear-gradient(135deg, #7c3aed, #6d28d9);
+          color: white;
+          padding: 0.4rem 1.2rem;
+          border: none;
+          border-radius: 30px;
+          font-weight: 600;
+          font-size: 0.8rem;
+          cursor: pointer;
+          transition: all 0.25s ease;
+          box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25);
+        }
+
+        .btn-confirm:hover {
+          transform: translateY(-2px) scale(1.02);
+          box-shadow: 0 8px 24px rgba(124, 58, 237, 0.35);
+        }
+
+        .btn-cancel {
+          background: linear-gradient(135deg, #ef4444, #dc2626);
+          color: white;
+          padding: 0.4rem 1.2rem;
+          border: none;
+          border-radius: 30px;
+          font-weight: 600;
+          font-size: 0.8rem;
+          cursor: pointer;
+          transition: all 0.25s ease;
+          box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+        }
+
+        .btn-cancel:hover {
+          transform: translateY(-2px) scale(1.02);
+          box-shadow: 0 8px 24px rgba(239, 68, 68, 0.35);
+        }
+
+        .btn-complete {
+          background: linear-gradient(135deg, #10b981, #059669);
+          color: white;
+          padding: 0.4rem 1.2rem;
+          border: none;
+          border-radius: 30px;
+          font-weight: 600;
+          font-size: 0.8rem;
+          cursor: pointer;
+          transition: all 0.25s ease;
+          box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+        }
+
+        .btn-complete:hover {
+          transform: translateY(-2px) scale(1.02);
+          box-shadow: 0 8px 24px rgba(16, 185, 129, 0.35);
         }
       `}</style>
     </div>
