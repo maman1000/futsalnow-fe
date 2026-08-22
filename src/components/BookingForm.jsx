@@ -9,6 +9,8 @@ const toLocalDate = (d) => {
   return `${year}-${month}-${day}`;
 };
 
+const DURATION_OPTIONS = [1, 2, 3, 4]; // maksimal 4 jam (bisa disesuaikan)
+
 export default function BookingForm({ service }) {
   const navigate = useNavigate();
   const [date, setDate] = useState(() => {
@@ -17,7 +19,8 @@ export default function BookingForm({ service }) {
     return toLocalDate(besok);
   });
   const [schedules, setSchedules] = useState([]);
-  const [selected, setSelected] = useState("");
+  const [selectedStartIndex, setSelectedStartIndex] = useState(""); // index slot mulai
+  const [duration, setDuration] = useState(1); // durasi dalam jam
   const [notes, setNotes] = useState("");
   const [loadingSlots, setLoadingSlots] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -25,7 +28,7 @@ export default function BookingForm({ service }) {
 
   const fetchSchedules = useCallback(async () => {
     setLoadingSlots(true);
-    setSelected("");
+    setSelectedStartIndex("");
     setError("");
     try {
       const res = await getAvailableSlots(service.id, date);
@@ -47,25 +50,42 @@ export default function BookingForm({ service }) {
     e.preventDefault();
     setError("");
 
-    if (!selected) {
-      setError("Silakan pilih slot jadwal terlebih dahulu.");
+    if (selectedStartIndex === "") {
+      setError("Silakan pilih jam mulai.");
       return;
     }
 
-    const index = Number(selected);
-    const selectedSlot = schedules[index];
-    if (!selectedSlot) {
-      setError("Slot jadwal tidak valid.");
+    const startIdx = Number(selectedStartIndex);
+    const endIdx = startIdx + duration - 1;
+
+    // Cek apakah durasi melewati batas slot
+    if (endIdx >= schedules.length) {
+      setError(
+        "Durasi melewati jam operasional. Pilih durasi yang lebih pendek.",
+      );
       return;
     }
+
+    // Cek apakah semua slot dalam rentang tersedia
+    for (let i = startIdx; i <= endIdx; i++) {
+      if (!schedules[i].available) {
+        setError(
+          `Slot ${schedules[i].start}–${schedules[i].end} tidak tersedia.`,
+        );
+        return;
+      }
+    }
+
+    const startSlot = schedules[startIdx];
+    const endSlot = schedules[endIdx];
 
     setSubmitting(true);
     try {
       const payload = {
         service_id: service.id,
         booking_date: date,
-        start_time: selectedSlot.start,
-        end_time: selectedSlot.end,
+        start_time: startSlot.start,
+        end_time: endSlot.end,
         notes: notes || null,
       };
       console.log("PAYLOAD:", payload);
@@ -85,7 +105,7 @@ export default function BookingForm({ service }) {
       <div className="booking-form-header">
         <h2 className="booking-form-title">📋 Booking — {service.name}</h2>
         <p className="booking-form-subtitle">
-          Pilih tanggal dan jam yang kamu inginkan.
+          Pilih tanggal, jam mulai, dan durasi yang kamu inginkan.
         </p>
       </div>
 
@@ -109,9 +129,9 @@ export default function BookingForm({ service }) {
           />
         </div>
 
-        {/* Slot Jadwal */}
+        {/* Jam Mulai */}
         <div className="form-group">
-          <label className="form-label">⏰ Pilih Slot Jadwal</label>
+          <label className="form-label">⏰ Jam Mulai</label>
           {loadingSlots ? (
             <div className="slot-loading">
               <span className="spinner-sm"></span>
@@ -120,30 +140,41 @@ export default function BookingForm({ service }) {
           ) : schedules.length === 0 ? (
             <p className="slot-empty">Tidak ada jadwal pada tanggal ini.</p>
           ) : (
-            <div className="slot-grid">
+            <select
+              className="form-input"
+              value={selectedStartIndex}
+              onChange={(e) => setSelectedStartIndex(e.target.value)}
+              required
+            >
+              <option value="">— Pilih jam mulai —</option>
               {schedules.map((slot, index) => (
-                <label
-                  key={index}
-                  className={`slot-item ${!slot.available ? "slot-disabled" : ""} ${
-                    String(index) === selected ? "slot-active" : ""
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="schedule"
-                    value={index}
-                    disabled={!slot.available}
-                    checked={String(index) === selected}
-                    onChange={() => setSelected(String(index))}
-                  />
-                  <span className="slot-time">
-                    {slot.start} – {slot.end}
-                  </span>
-                  {!slot.available && <span className="slot-badge">Penuh</span>}
-                </label>
+                <option key={index} value={index} disabled={!slot.available}>
+                  {slot.start} – {slot.end} {!slot.available && "(penuh)"}
+                </option>
               ))}
-            </div>
+            </select>
           )}
+        </div>
+
+        {/* Durasi */}
+        <div className="form-group">
+          <label className="form-label">⏱️ Durasi</label>
+          <select
+            className="form-input"
+            value={duration}
+            onChange={(e) => setDuration(Number(e.target.value))}
+            disabled={loadingSlots || schedules.length === 0}
+          >
+            {DURATION_OPTIONS.map((d) => (
+              <option key={d} value={d}>
+                {d} jam
+              </option>
+            ))}
+          </select>
+          <p className="form-hint">
+            Pilih durasi booking (maksimal{" "}
+            {DURATION_OPTIONS[DURATION_OPTIONS.length - 1]} jam)
+          </p>
         </div>
 
         {/* Catatan */}
@@ -160,7 +191,11 @@ export default function BookingForm({ service }) {
         </div>
 
         {/* Tombol Submit */}
-        <button type="submit" className="btn-submit" disabled={submitting}>
+        <button
+          type="submit"
+          className="btn-submit"
+          disabled={submitting || loadingSlots}
+        >
           {submitting ? (
             <>
               <span className="spinner-sm"></span>
@@ -172,30 +207,26 @@ export default function BookingForm({ service }) {
         </button>
       </form>
 
-      {/* CSS inline (bisa dipindahkan ke file terpisah) */}
+      {/* CSS (sama seperti sebelumnya, sudah optimal) */}
       <style>{`
         .booking-form-wrapper {
           max-width: 720px;
           margin: 0 auto;
           padding: 1.5rem 1rem;
         }
-
         .booking-form-header {
           margin-bottom: 2rem;
         }
-
         .booking-form-title {
           font-size: 1.8rem;
           font-weight: 700;
           color: #1f2937;
           margin-bottom: 0.25rem;
         }
-
         .booking-form-subtitle {
           color: #6b7280;
           font-size: 1rem;
         }
-
         .booking-form {
           background: white;
           padding: 2rem 1.75rem;
@@ -203,11 +234,9 @@ export default function BookingForm({ service }) {
           box-shadow: 0 4px 20px rgba(0,0,0,0.04);
           border: 1px solid #f3f0ff;
         }
-
         .form-group {
           margin-bottom: 1.75rem;
         }
-
         .form-label {
           display: block;
           font-weight: 600;
@@ -215,7 +244,6 @@ export default function BookingForm({ service }) {
           margin-bottom: 0.5rem;
           font-size: 0.95rem;
         }
-
         .form-input {
           width: 100%;
           padding: 0.7rem 1rem;
@@ -225,14 +253,17 @@ export default function BookingForm({ service }) {
           transition: 0.2s;
           background: #fafafa;
         }
-
         .form-input:focus {
           outline: none;
           border-color: #7c3aed;
           background: white;
           box-shadow: 0 0 0 4px rgba(124,58,237,0.08);
         }
-
+        .form-hint {
+          font-size: 0.8rem;
+          color: #9ca3af;
+          margin-top: 0.3rem;
+        }
         .slot-loading {
           display: flex;
           align-items: center;
@@ -240,76 +271,10 @@ export default function BookingForm({ service }) {
           color: #6b7280;
           padding: 0.5rem 0;
         }
-
         .slot-empty {
           color: #6b7280;
           padding: 0.5rem 0;
         }
-
-        .slot-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-          gap: 0.75rem;
-        }
-
-        .slot-item {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          padding: 0.6rem 0.4rem;
-          border: 2px solid #e5e7eb;
-          border-radius: 16px;
-          background: white;
-          cursor: pointer;
-          transition: all 0.2s;
-          text-align: center;
-          min-height: 64px;
-          position: relative;
-        }
-
-        .slot-item:hover:not(.slot-disabled) {
-          border-color: #c4b5fd;
-          transform: translateY(-2px);
-        }
-
-        .slot-active {
-          border-color: #7c3aed !important;
-          background: #f5f3ff;
-          box-shadow: 0 4px 12px rgba(124,58,237,0.12);
-        }
-
-        .slot-disabled {
-          background: #f9fafb;
-          border-color: #e5e7eb;
-          cursor: not-allowed;
-          opacity: 0.6;
-        }
-
-        .slot-item input[type="radio"] {
-          display: none;
-        }
-
-        .slot-time {
-          font-weight: 500;
-          color: #1f2937;
-          font-size: 0.9rem;
-        }
-
-        .slot-disabled .slot-time {
-          color: #9ca3af;
-        }
-
-        .slot-badge {
-          font-size: 0.65rem;
-          font-weight: 600;
-          color: #9ca3af;
-          background: #f3f4f6;
-          padding: 0.15rem 0.6rem;
-          border-radius: 20px;
-          margin-top: 0.2rem;
-        }
-
         .btn-submit {
           width: 100%;
           padding: 0.8rem 1.5rem;
@@ -326,19 +291,16 @@ export default function BookingForm({ service }) {
           justify-content: center;
           gap: 0.5rem;
         }
-
         .btn-submit:hover:not(:disabled) {
           background: #6d28d9;
           transform: scale(1.02);
           box-shadow: 0 8px 24px rgba(124,58,237,0.25);
         }
-
         .btn-submit:disabled {
           opacity: 0.6;
           cursor: not-allowed;
           transform: none;
         }
-
         .spinner-sm {
           display: inline-block;
           width: 18px;
@@ -348,11 +310,9 @@ export default function BookingForm({ service }) {
           border-radius: 50%;
           animation: spin 0.8s linear infinite;
         }
-
         @keyframes spin {
           to { transform: rotate(360deg); }
         }
-
         .alert {
           padding: 0.75rem 1rem;
           border-radius: 14px;
