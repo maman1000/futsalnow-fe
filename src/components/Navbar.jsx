@@ -726,6 +726,10 @@ export default function Navbar() {
           .navbar-mobile-auth {
             display: none !important;
           }
+          .mobile-divider,
+          .mobile-logout-btn {
+            display: none !important; /* ✅ tambahkan ini */
+          }            
         }
       `}</style>
     </nav>
