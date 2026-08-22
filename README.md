@@ -49,24 +49,24 @@ Frontend aplikasi booking lapangan futsal **FutsalNow**. Dibangun dengan React 1
 git clone https://github.com/maman1000/futsalnow-fe.git
 cd futsalnow-fe
 
-2. Install Dependencies
+### 2. Install Dependencies
 bash
 npm install
 
-3. Setup Environment Variables
+### 3. Setup Environment Variables
 Buat file .env di root project:
 
 env
 VITE_API_URL=http://localhost:8000/api
 Untuk production, ganti dengan URL backend di Railway.
 
-4. Jalankan Development Server
+### 4. Jalankan Development Server
 bash
 npm run dev
 
 Aplikasi berjalan di http://localhost:5173
 
-📁 Struktur Folder
+## 📁 Struktur Folder
 text
 src/
 ├── api/
@@ -96,16 +96,16 @@ src/
 ├── App.jsx
 ├── main.jsx
 └── styles.css             # Global styles (tema ungu)
-🌐 API Integration
+## 🌐 API Integration
 Backend API berada di:
 
-Production: https://booking-production-8fcc.up.railway.app/api
+Production: https://booking-production-xxxx.up.railway.app/api
 
 Local: http://localhost:8000/api
 
 Dokumentasi API lengkap: Link Postman
 
-🚀 Deployment ke Vercel
+## 🚀 Deployment ke Vercel
 Push repository ke GitHub.
 
 Buka vercel.com → Import Project.
@@ -114,17 +114,17 @@ Pilih repository futsalnow-fe.
 
 Tambahkan environment variable:
 
-VITE_API_URL = https://booking-production-8fcc.up.railway.app/api
+VITE_API_URL = https://booking-production-xxxx.up.railway.app/api
 
 Klik Deploy.
 
-📄 Lisensi
+## 📄 Lisensi
 MIT © 2026 Maman Darusman
 
-🙏 Kontribusi
+## 🙏 Kontribusi
 Pull request dipersilakan. Untuk perubahan besar, buka issue terlebih dahulu.
 
-📬 Kontak
+## 📬 Kontak
 Email: [email Anda]
 
 LinkedIn: [linkedin.com/in/username]
