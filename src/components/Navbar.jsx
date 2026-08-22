@@ -609,7 +609,7 @@ export default function Navbar() {
         .dropdown-item.logout:hover { background: #fef2f2; }
         .dropdown-divider { border: none; border-top: 1px solid #f3f0ff; margin: 0.3rem 0; }
 
-        /* ===== RESPONSIVE ===== */
+       /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
           .hamburger {
             display: flex;
@@ -640,18 +640,49 @@ export default function Navbar() {
             opacity: 1;
             pointer-events: auto;
           }
+
           .navbar-links a {
             padding: 0.7rem 1rem;
             width: 100%;
+            color: #1f2937; /* gelap, kontras dengan background putih */
+            font-weight: 500;
+            border-radius: 8px;
+          }
+          .navbar-links a:hover {
+            background: #f5f3ff;
+            color: #7C3AED;
+          }
+          .navbar-links a.active {
+            background: #7C3AED;
+            color: white;
           }
 
           .navbar-user {
-            display: none; /* sembunyikan user area di mobile */
+            display: none;
           }
 
-          /* Tampilkan tombol auth di menu mobile jika belum login */
           .navbar-mobile-auth {
             display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid #e5e7eb;
+            width: 100%;
+          }
+          .navbar-mobile-auth .btn {
+            width: 100%;
+            justify-content: center;
+            padding: 0.6rem;
+            font-size: 0.9rem;
+          }
+          .navbar-mobile-auth .btn-outline {
+            color: #374151;
+            border-color: #d1d5db;
+          }
+          .navbar-mobile-auth .btn-primary {
+            background: #7C3AED;
+            color: white;
           }
         }
 
