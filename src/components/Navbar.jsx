@@ -338,6 +338,17 @@ export default function Navbar() {
             )}
           </>
         )}
+
+        {/* 👇 TAMBAHKAN INI: Tombol Logout untuk mobile */}
+        {user && (
+          <>
+            <hr className="mobile-divider" />
+            <button className="mobile-logout-btn" onClick={handleLogout}>
+              🚪 Keluar
+            </button>
+          </>
+        )}
+
         {/* Tampilkan tombol login/register di menu mobile jika belum login */}
         {!user && (
           <div className="navbar-mobile-auth">
@@ -683,6 +694,31 @@ export default function Navbar() {
           .navbar-mobile-auth .btn-primary {
             background: #7C3AED;
             color: white;
+          }
+          .mobile-divider {
+            border: none;
+            border-top: 1px solid #e5e7eb;
+            margin: 0.5rem 0;
+          }
+
+          .mobile-logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.7rem 1rem;
+            width: 100%;
+            background: none;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #dc2626;
+            cursor: pointer;
+            transition: background 0.2s;
+            text-align: left;
+          }
+          .mobile-logout-btn:hover {
+            background: #fee2e2;
           }
         }
 
