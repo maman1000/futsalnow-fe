@@ -37,7 +37,7 @@ Frontend aplikasi booking lapangan futsal **FutsalNow**. Dibangun dengan React 1
 | Build Tool | Vite 5 |
 | Routing | React Router DOM 6 |
 | HTTP Client | Axios |
-| Styling | CSS Custom (dengan tema ungu) |
+| Styling | CSS Custom (tema ungu) |
 | Deployment | Vercel |
 
 ---
@@ -48,26 +48,34 @@ Frontend aplikasi booking lapangan futsal **FutsalNow**. Dibangun dengan React 1
 ```bash
 git clone https://github.com/maman1000/futsalnow-fe.git
 cd futsalnow-fe
+```
 
 ### 2. Install Dependencies
-bash
+```bash
 npm install
+```
 
 ### 3. Setup Environment Variables
-Buat file .env di root project:
+Buat file `.env` di root project:
 
-env
+```env
 VITE_API_URL=http://localhost:8000/api
-Untuk production, ganti dengan URL backend di Railway.
+```
+
+> **Catatan:** Untuk production, ganti dengan URL backend di Railway.
 
 ### 4. Jalankan Development Server
-bash
+```bash
 npm run dev
+```
 
-Aplikasi berjalan di http://localhost:5173
+Aplikasi berjalan di `http://localhost:5173`
+
+---
 
 ## 📁 Struktur Folder
-text
+
+```
 src/
 ├── api/
 │   ├── client.js          # Axios instance
@@ -96,39 +104,45 @@ src/
 ├── App.jsx
 ├── main.jsx
 └── styles.css             # Global styles (tema ungu)
+```
+
+---
+
 ## 🌐 API Integration
+
 Backend API berada di:
 
-Production: https://booking-production-xxxx.up.railway.app/api
+- **Production:** `https://booking-production-xxxx.up.railway.app/api`
+- **Local:** `http://localhost:8000/api`
 
-Local: http://localhost:8000/api
-
-Dokumentasi API lengkap: Link Postman
+Dokumentasi API lengkap: [Link Postman](https://documenter.getpostman.com/view/48765304/2sBYArVtFJ)
+---
 
 ## 🚀 Deployment ke Vercel
-Push repository ke GitHub.
 
-Buka vercel.com → Import Project.
+1. Push repository ke GitHub.
+2. Buka [vercel.com](https://vercel.com) → Import Project.
+3. Pilih repository `futsalnow-fe`.
+4. Tambahkan environment variable:
+   - `VITE_API_URL` = `https://booking-production-xxxx.up.railway.app/api`
+5. Klik **Deploy**.
 
-Pilih repository futsalnow-fe.
-
-Tambahkan environment variable:
-
-VITE_API_URL = https://booking-production-xxxx.up.railway.app/api
-
-Klik Deploy.
+---
 
 ## 📄 Lisensi
+
 MIT © 2026 Maman Darusman
 
+---
+
 ## 🙏 Kontribusi
+
 Pull request dipersilakan. Untuk perubahan besar, buka issue terlebih dahulu.
 
+---
+
 ## 📬 Kontak
-Email: [email Anda]
 
-LinkedIn: [linkedin.com/in/username]
-
-Demo: https://futsalnow-fe.vercel.app
-
-
+- **Email:** [mamandarusman.st@gmail.com]
+- **LinkedIn:** [https://www.linkedin.com/in/maman-darusman-88ba2696/]
+- **Demo:** [https://futsalnow-fe.vercel.app](https://futsalnow-fe.vercel.app)
