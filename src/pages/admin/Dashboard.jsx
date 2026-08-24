@@ -45,56 +45,77 @@ export default function Dashboard() {
   }
 
   const byStatus = summary.bookings_by_status || {};
+  const totalBookings = summary.total_bookings ?? 0;
+  const totalRevenue = summary.total_revenue ?? 0;
+
+  const stats = [
+    {
+      label: "Total Booking",
+      value: totalBookings,
+      icon: "📊",
+      bg: "bg-blue",
+      text: "text-blue-700",
+    },
+    {
+      label: "Total Pendapatan",
+      value: formatRupiah(totalRevenue),
+      icon: "💰",
+      bg: "bg-green",
+      text: "text-green-700",
+    },
+    {
+      label: "Pending",
+      value: byStatus.pending ?? 0,
+      icon: "⏳",
+      bg: "bg-yellow",
+      text: "text-yellow-700",
+    },
+    {
+      label: "Confirmed",
+      value: byStatus.confirmed ?? 0,
+      icon: "✓",
+      bg: "bg-blue-light",
+      text: "text-blue-700",
+    },
+    {
+      label: "Completed",
+      value: byStatus.completed ?? 0,
+      icon: "✔",
+      bg: "bg-green-light",
+      text: "text-green-700",
+    },
+    {
+      label: "Canceled",
+      value: byStatus.canceled ?? 0,
+      icon: "✕",
+      bg: "bg-red",
+      text: "text-red-700",
+    },
+  ];
 
   return (
-    <div className="page-content dashboard-page">
-      <div className="dashboard-header">
-        <h1 className="dashboard-title">📊 Dashboard Admin</h1>
-        <p className="dashboard-subtitle">
-          Ringkasan performa bisnis futsal-mu.
-        </p>
+    <div className="dashboard-proka">
+      {/* ===== STATS GRID ===== */}
+      <div className="stats-grid-proka">
+        {stats.map((stat, index) => (
+          <div key={index} className={`stat-card-proka ${stat.bg}`}>
+            <div className="stat-icon">{stat.icon}</div>
+            <div className="stat-content">
+              <span className="stat-label">{stat.label}</span>
+              <span className={`stat-value ${stat.text}`}>{stat.value}</span>
+            </div>
+          </div>
+        ))}
       </div>
 
-      {/* Statistik Grid */}
-      <div className="stats-grid">
-        <StatCard
-          icon="📋"
-          label="Total Booking"
-          value={summary.total_bookings}
-          bg="bg-blue-soft"
-          textColor="text-blue-700"
-        />
-        <StatCard
-          icon="💰"
-          label="Total Pendapatan"
-          value={formatRupiah(summary.total_revenue)}
-          bg="bg-green-soft"
-          textColor="text-green-700"
-        />
-        <StatCard
-          icon="⏳"
-          label="Pending"
-          value={byStatus.pending ?? 0}
-          bg="bg-yellow-soft"
-          textColor="text-yellow-700"
-        />
-        <StatCard
-          icon="✅"
-          label="Selesai / Batal"
-          value={`${byStatus.completed ?? 0} / ${byStatus.canceled ?? 0}`}
-          bg="bg-purple-soft"
-          textColor="text-purple-700"
-        />
-      </div>
-
-      {/* Top Services */}
-      <div className="top-services-section">
-        <h2 className="section-title">🏆 Lapangan Terlaris</h2>
+      {/* ===== TOP SERVICES ===== */}
+      <div className="top-services-proka">
+        <h3 className="section-title">Lapangan Terlaris</h3>
         {!summary.top_services || summary.top_services.length === 0 ? (
-          <p className="empty-data">Belum ada data booking.</p>
+          <p className="empty-data">Data booking masih kosong 😅</p>
         ) : (
           <div className="table-wrapper">
-            <table className="top-services-table">
+            <table className="table-proka">
               <thead>
                 <tr>
                   <th>#</th>
@@ -106,10 +127,10 @@ export default function Dashboard() {
               <tbody>
                 {summary.top_services.map((s, i) => (
                   <tr key={s.service_id}>
-                    <td className="rank">{i + 1}</td>
-                    <td className="service-name">{s.name}</td>
+                    <td>{i + 1}</td>
+                    <td>{s.name}</td>
                     <td>{s.total_bookings}</td>
-                    <td className="revenue">{formatRupiah(s.revenue)}</td>
+                    <td>{formatRupiah(s.revenue)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -118,167 +139,149 @@ export default function Dashboard() {
         )}
       </div>
 
-      {/* CSS inline (bisa dipindah ke file terpisah) */}
+      {/* ===== CSS ===== */}
       <style>{`
-        .dashboard-page {
+        .dashboard-proka {
           max-width: 1200px;
           margin: 0 auto;
-          padding: 2rem 1.5rem;
         }
 
-        .dashboard-header {
+        /* ===== STATS GRID ===== */
+        .stats-grid-proka {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+          gap: 1rem;
           margin-bottom: 2rem;
         }
 
-        .dashboard-title {
-          font-size: 2rem;
-          font-weight: 700;
-          color: #1f2937;
-          margin-bottom: 0.25rem;
-        }
-
-        .dashboard-subtitle {
-          color: #6b7280;
-          font-size: 1rem;
-        }
-
-        .stats-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-          gap: 1.5rem;
-          margin-bottom: 2.5rem;
-        }
-
-        .stat-card {
-          background: white;
-          border-radius: 20px;
-          padding: 1.5rem 1.25rem;
-          box-shadow: 0 4px 16px rgba(0,0,0,0.04);
-          border: 1px solid #f3f0ff;
-          transition: 0.25s;
+        .stat-card-proka {
           display: flex;
           align-items: center;
-          gap: 1rem;
+          gap: 0.75rem;
+          padding: 1rem 1.25rem;
+          border-radius: 14px;
+          background: white;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+          transition: all 0.25s ease;
+          border: 1px solid #f0f0f0;
+          min-width: 0;
+          overflow: hidden;
         }
-
-        .stat-card:hover {
+        .stat-card-proka:hover {
           transform: translateY(-4px);
-          box-shadow: 0 12px 32px rgba(124,58,237,0.08);
-          border-color: #d4c4ff;
+          box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
         }
 
         .stat-icon {
-          font-size: 2rem;
-          width: 48px;
-          height: 48px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          border-radius: 16px;
+          font-size: 1.6rem;
+          line-height: 1;
+          width: 40px;
+          text-align: center;
           flex-shrink: 0;
         }
-
-        .bg-blue-soft { background: #dbeafe; }
-        .bg-green-soft { background: #d1fae5; }
-        .bg-yellow-soft { background: #fef3c7; }
-        .bg-purple-soft { background: #f3e8ff; }
 
         .stat-content {
           flex: 1;
           min-width: 0;
         }
-
         .stat-label {
-          font-size: 0.85rem;
-          color: #6b7280;
-          font-weight: 500;
           display: block;
-          margin-bottom: 0.15rem;
+          font-size: 0.7rem;
+          font-weight: 600;
+          color: #6b7280;
+          text-transform: uppercase;
+          letter-spacing: 0.03em;
         }
-
         .stat-value {
-          font-size: 1.6rem;
+          display: block;
+          font-size: 1.3rem;
           font-weight: 700;
           color: #1f2937;
           line-height: 1.2;
+          margin-top: 0.1rem;
+          word-break: break-word;
+          overflow-wrap: break-word;
         }
 
-        .text-blue-700 .stat-value { color: #1d4ed8; }
-        .text-green-700 .stat-value { color: #16a34a; }
-        .text-yellow-700 .stat-value { color: #b45309; }
-        .text-purple-700 .stat-value { color: #7c3aed; }
+        /* ===== WARNA CARD ===== */
+        .bg-blue { background: #dbeafe; }
+        .bg-blue-light { background: #dbeafe; }
+        .bg-green { background: #d1fae5; }
+        .bg-green-light { background: #d1fae5; }
+        .bg-yellow { background: #fef3c7; }
+        .bg-red { background: #fee2e2; }
 
-        .top-services-section {
-          background: white;
-          border-radius: 24px;
-          padding: 1.5rem 1.5rem 0.5rem;
-          box-shadow: 0 4px 16px rgba(0,0,0,0.04);
-          border: 1px solid #f3f0ff;
-        }
+        .text-blue-700 { color: #1d4ed8; }
+        .text-green-700 { color: #16a34a; }
+        .text-yellow-700 { color: #b45309; }
+        .text-red-700 { color: #b91c1c; }
 
-        .section-title {
-          font-size: 1.4rem;
-          font-weight: 600;
-          color: #1f2937;
-          margin-bottom: 1.25rem;
-        }
-
-        .empty-data {
-          color: #6b7280;
-          padding: 1rem 0 1.5rem;
-        }
-
+        /* ===== TABEL PROKA ===== */
         .table-wrapper {
           overflow-x: auto;
-          margin: 0 -0.5rem;
-          padding: 0 0.5rem;
+          background: white;
+          border-radius: 16px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+          border: 1px solid #f0f0f0;
         }
-
-        .top-services-table {
+        .table-proka {
           width: 100%;
           border-collapse: collapse;
-          font-size: 0.95rem;
+          font-size: 0.9rem;
         }
-
-        .top-services-table thead {
-          background: #f9fafb;
-          border-radius: 12px 12px 0 0;
+        .table-proka thead {
+          background: #1a1a2e;
+          color: #fff;
         }
-
-        .top-services-table th {
+        .table-proka th {
+          padding: 12px 16px;
           text-align: left;
-          padding: 0.75rem 1rem;
           font-weight: 600;
-          color: #374151;
-          font-size: 0.85rem;
+          font-size: 0.8rem;
           text-transform: uppercase;
           letter-spacing: 0.03em;
-          border-bottom: 1px solid #e5e7eb;
+          white-space: nowrap;
+        }
+        .table-proka td {
+          padding: 12px 16px;
+          border-bottom: 1px solid #f0f0f0;
+          vertical-align: middle;
+        }
+        .table-proka tbody tr:hover {
+          background: #f8f9fc;
         }
 
-        .top-services-table td {
-          padding: 0.75rem 1rem;
-          border-bottom: 1px solid #f3f4f6;
+        .top-services-proka {
+          background: white;
+          border-radius: 16px;
+          padding: 1.5rem;
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+          border: 1px solid #f0f0f0;
+        }
+        .section-title {
+          font-size: 1.1rem;
+          font-weight: 600;
           color: #1f2937;
+          margin-bottom: 1rem;
         }
-
-        .top-services-table tbody tr:hover {
-          background: #faf9ff;
-        }
-
-        .top-services-table .rank {
-          font-weight: 600;
+        .empty-data {
           color: #6b7280;
-          width: 40px;
+          padding: 1rem 0;
         }
 
-        .top-services-table .service-name {
-          font-weight: 500;
+        .spinner {
+          width: 36px;
+          height: 36px;
+          border: 4px solid #f3f0ff;
+          border-top: 4px solid #1e293b;
+          border-radius: 50%;
+          animation: spin 0.8s linear infinite;
+          margin: 0 auto 12px;
         }
-
-        .top-services-table .revenue {
-          font-weight: 600;
-          color: #7c3aed;
+        @keyframes spin {
+          to {
+            transform: rotate(360deg);
+          }
         }
 
         .dashboard-loading,
@@ -287,75 +290,55 @@ export default function Dashboard() {
           flex-direction: column;
           align-items: center;
           justify-content: center;
-          min-height: 60vh;
+          padding: 4rem 0;
           color: #6b7280;
         }
-
-        .spinner {
-          width: 40px;
-          height: 40px;
-          border: 4px solid #f3f0ff;
-          border-top: 4px solid #7c3aed;
-          border-radius: 50%;
-          animation: spin 0.8s linear infinite;
-          margin-bottom: 1rem;
-        }
-
-        @keyframes spin {
-          to { transform: rotate(360deg); }
-        }
-
         .alert {
           padding: 0.75rem 1rem;
-          border-radius: 14px;
-          font-size: 0.9rem;
-          border-left: 4px solid;
+          border-radius: 8px;
         }
         .alert-error {
-          background: #fef2f2;
-          border-color: #dc2626;
+          background: #fee2e2;
           color: #991b1b;
+          border: 1px solid #ef4444;
         }
 
-        @media (max-width: 640px) {
-          .stats-grid {
-            grid-template-columns: 1fr 1fr;
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+          .stats-grid-proka {
+            grid-template-columns: repeat(2, 1fr);
             gap: 0.75rem;
           }
-          .stat-card {
+          .stat-card-proka {
             padding: 1rem;
             flex-direction: column;
             text-align: center;
           }
+          .stat-icon {
+            font-size: 1.5rem;
+            width: auto;
+          }
           .stat-value {
             font-size: 1.3rem;
           }
-          .stat-icon {
-            font-size: 1.5rem;
-            width: 40px;
-            height: 40px;
+        }
+
+        @media (max-width: 480px) {
+          .stats-grid-proka {
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
           }
-          .dashboard-title {
-            font-size: 1.5rem;
+          .stat-card-proka {
+            padding: 0.75rem;
           }
-          .top-services-section {
-            padding: 1rem 1rem 0.25rem;
+          .stat-value {
+            font-size: 1.1rem;
+          }
+          .stat-label {
+            font-size: 0.65rem;
           }
         }
       `}</style>
-    </div>
-  );
-}
-
-// ===== Komponen StatCard =====
-function StatCard({ icon, label, value, bg }) {
-  return (
-    <div className="stat-card">
-      <div className={`stat-icon ${bg}`}>{icon}</div>
-      <div className="stat-content">
-        <span className="stat-label">{label}</span>
-        <span className="stat-value">{value}</span>
-      </div>
     </div>
   );
 }

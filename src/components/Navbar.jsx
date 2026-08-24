@@ -1,20 +1,16 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useState } from "react";
-
-// Ikon sederhana
-const HomeIcon = () => <span className="nav-icon">🏠</span>;
-const ServicesIcon = () => <span className="nav-icon">📋</span>;
-const BookingsIcon = () => <span className="nav-icon">📅</span>;
-const DashboardIcon = () => <span className="nav-icon">📊</span>;
-const ScheduleIcon = () => <span className="nav-icon">⏰</span>;
-const ReportIcon = () => <span className="nav-icon">📈</span>;
+import {
+  UserCircleIcon,
+  ArrowRightOnRectangleIcon,
+  CalendarIcon,
+} from "@heroicons/react/24/outline";
 
 export default function Navbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const [isMenuOpen, setIsMenuOpen] = useState(false); // <-- TAMBAHKAN
-
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [closeTimeout, setCloseTimeout] = useState(null);
 
@@ -34,6 +30,7 @@ export default function Navbar() {
   };
 
   const handleLogout = async () => {
+    closeMenu();
     await logout();
     navigate("/login");
   };
@@ -43,9 +40,9 @@ export default function Navbar() {
 
   return (
     <nav className="navbar">
+      {/* ===== BRAND ===== */}
       <Link to="/" className="navbar-brand" onClick={closeMenu}>
-        <span className="brand-icon">⚽</span>
-        Futsal<span className="brand-highlight">Now</span>
+        FutsalNow
       </Link>
 
       {/* ===== HAMBURGER BUTTON ===== */}
@@ -64,48 +61,48 @@ export default function Navbar() {
         {user?.role === "admin" ? (
           <>
             <NavLink to="/admin" onClick={closeMenu}>
-              <DashboardIcon /> Dashboard
+              Dashboard
             </NavLink>
             <NavLink to="/admin/bookings" onClick={closeMenu}>
-              <BookingsIcon /> Booking
+              Booking
             </NavLink>
             <NavLink to="/admin/services" onClick={closeMenu}>
-              <ServicesIcon /> Layanan
+              Layanan
             </NavLink>
             <NavLink to="/admin/schedules" onClick={closeMenu}>
-              <ScheduleIcon /> Jadwal
+              Jadwal
             </NavLink>
             <NavLink to="/admin/reports" onClick={closeMenu}>
-              <ReportIcon /> Laporan
+              Laporan
             </NavLink>
           </>
         ) : (
           <>
             <NavLink to="/" end onClick={closeMenu}>
-              <HomeIcon /> Beranda
+              Beranda
             </NavLink>
             <NavLink to="/services" onClick={closeMenu}>
-              <ServicesIcon /> Layanan
+              Layanan
             </NavLink>
             {user && (
               <NavLink to="/my-bookings" onClick={closeMenu}>
-                <BookingsIcon /> Booking Saya
+                Booking Saya
               </NavLink>
             )}
           </>
         )}
 
-        {/* 👇 TAMBAHKAN INI: Tombol Logout untuk mobile */}
+        {/* Logout di mobile */}
         {user && (
           <>
             <hr className="mobile-divider" />
             <button className="mobile-logout-btn" onClick={handleLogout}>
-              🚪 Keluar
+              <ArrowRightOnRectangleIcon className="mobile-icon" /> Keluar
             </button>
           </>
         )}
 
-        {/* Tampilkan tombol login/register di menu mobile jika belum login */}
+        {/* Auth buttons di mobile */}
         {!user && (
           <div className="navbar-mobile-auth">
             <Link
@@ -131,8 +128,6 @@ export default function Navbar() {
         {user ? (
           <div
             className="user-dropdown"
-            // onMouseEnter={() => setDropdownOpen(true)}
-            // onMouseLeave={() => setDropdownOpen(false)}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
           >
@@ -150,24 +145,23 @@ export default function Navbar() {
                   className="dropdown-item"
                   onClick={closeMenu}
                 >
-                  👤 Profil
+                  <UserCircleIcon className="dropdown-icon" /> Profil
                 </Link>
                 <Link
                   to="/my-bookings"
                   className="dropdown-item"
                   onClick={closeMenu}
                 >
-                  📅 Booking Saya
+                  <CalendarIcon className="dropdown-icon" /> Booking Saya
                 </Link>
                 <hr className="dropdown-divider" />
                 <button onClick={handleLogout} className="dropdown-item logout">
-                  🚪 Keluar
+                  <ArrowRightOnRectangleIcon className="dropdown-icon" /> Keluar
                 </button>
               </div>
             )}
           </div>
         ) : (
-          // Login/Register desktop
           <>
             <Link to="/login" className="btn btn-outline btn-sm">
               Masuk
@@ -181,33 +175,29 @@ export default function Navbar() {
 
       {/* ===== STYLE ===== */}
       <style>{`
-        /* ===== NAVBAR ===== */
         .navbar {
           background: rgba(255, 255, 255, 0.85);
-          backdrop-filter: blur(8px);
-          border-bottom: 1px solid #f3f0ff;
+          backdrop-filter: blur(12px);
+          border-bottom: 1px solid #e8ecf1;
           padding: 0 1.5rem;
-          height: 68px;
+          height: 64px;
           display: flex;
           align-items: center;
           justify-content: space-between;
           position: sticky;
           top: 0;
           z-index: 50;
+          transition: box-shadow 0.3s ease;
         }
 
         .navbar-brand {
           font-size: 1.25rem;
           font-weight: 700;
           color: #1f2937;
-          display: flex;
-          align-items: center;
           text-decoration: none;
+          letter-spacing: -0.02em;
         }
-        .brand-icon { font-size: 1.5rem; margin-right: 0.3rem; }
-        .brand-highlight { color: #7C3AED; }
 
-        /* ===== HAMBURGER ===== */
         .hamburger {
           display: none;
           flex-direction: column;
@@ -219,8 +209,8 @@ export default function Navbar() {
           z-index: 60;
         }
         .hamburger-line {
-          width: 28px;
-          height: 3px;
+          width: 26px;
+          height: 2.5px;
           background: #1f2937;
           border-radius: 4px;
           transition: all 0.3s ease;
@@ -236,7 +226,6 @@ export default function Navbar() {
           transform: rotate(-45deg) translate(6px, -6px);
         }
 
-        /* ===== NAV LINKS ===== */
         .navbar-links {
           display: flex;
           align-items: center;
@@ -244,8 +233,8 @@ export default function Navbar() {
           transition: all 0.3s ease;
         }
         .navbar-links a {
-          padding: 0.5rem 1rem;
-          border-radius: 10px;
+          padding: 0.4rem 0.9rem;
+          border-radius: 8px;
           font-size: 0.9rem;
           font-weight: 500;
           color: #4b5563;
@@ -253,48 +242,31 @@ export default function Navbar() {
           transition: all 0.2s;
           display: flex;
           align-items: center;
+          gap: 0.4rem;
         }
         .navbar-links a:hover {
-          background: #f5f3ff;
-          color: #7C3AED;
+          background: #f1f5f9;
+          color: #1f2937;
         }
         .navbar-links a.active {
-          background: #7C3AED;
+          background: #1e293b;
           color: white;
         }
-        .nav-icon { margin-right: 0.3rem; font-size: 0.9rem; }
 
-        /* Mobile auth buttons (hidden on desktop) */
-        .navbar-mobile-auth {
-          display: none;
-          flex-direction: column;
-          gap: 0.5rem;
-          margin-top: 0.5rem;
-          padding-top: 0.5rem;
-          border-top: 1px solid #e5e7eb;
-          width: 100%;
-        }
-        .navbar-mobile-auth .btn {
-          width: 100%;
-          justify-content: center;
-        }
-
-        /* ===== USER AREA (DESKTOP) ===== */
         .navbar-user {
           display: flex;
           align-items: center;
           gap: 0.75rem;
         }
 
-        /* Tombol */
         .btn {
-          padding: 0.5rem 1.25rem;
-          border-radius: 10px;
+          padding: 0.4rem 1.2rem;
+          border-radius: 30px;
           font-weight: 500;
           font-size: 0.85rem;
           border: none;
           cursor: pointer;
-          transition: all 0.2s;
+          transition: all 0.25s ease;
           text-decoration: none;
           display: inline-flex;
           align-items: center;
@@ -310,20 +282,17 @@ export default function Navbar() {
           border-color: #9ca3af;
         }
         .btn-primary {
-          background: #7C3AED;
+          background: #1e293b;
           color: white;
         }
         .btn-primary:hover {
-          background: #6d28d9;
-          transform: translateY(-1px);
-          box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+          background: #0f172a;
         }
         .btn-sm {
-          padding: 0.3rem 0.9rem;
+          padding: 0.2rem 0.8rem;
           font-size: 0.8rem;
         }
 
-        /* User dropdown */
         .user-btn {
           display: flex;
           align-items: center;
@@ -331,54 +300,97 @@ export default function Navbar() {
           background: none;
           border: none;
           cursor: pointer;
-          padding: 0.3rem 0.8rem;
+          padding: 0.2rem 0.6rem;
           border-radius: 30px;
           transition: background 0.2s;
         }
-        .user-btn:hover { background: #f5f3ff; }
+        .user-btn:hover {
+          background: #f1f5f9;
+        }
         .user-avatar {
           width: 32px;
           height: 32px;
           border-radius: 50%;
-          background: #7C3AED;
+          background: #1e293b;
           color: white;
           display: flex;
           align-items: center;
           justify-content: center;
           font-weight: 600;
-          font-size: 0.9rem;
+          font-size: 0.8rem;
         }
-        .user-name { font-weight: 500; color: #1f2937; }
-        .dropdown-arrow { font-size: 0.7rem; color: #9ca3af; }
+        .user-name {
+          font-weight: 500;
+          color: #1f2937;
+        }
+        .dropdown-arrow {
+          font-size: 0.7rem;
+          color: #9ca3af;
+        }
 
-        .user-dropdown { position: relative; display: inline-block; }
+        .user-dropdown {
+          position: relative;
+          display: inline-block;
+        }
         .dropdown-menu {
           position: absolute;
           right: 0;
           top: 100%;
           margin-top: 0.5rem;
           background: white;
-          border-radius: 12px;
-          box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-          border: 1px solid #f3f0ff;
+          border-radius: 16px;
+          box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+          border: 1px solid #f1f5f9;
           padding: 0.4rem 0;
-          min-width: 180px;
+          min-width: 200px;
           z-index: 60;
+          animation: dropdownFade 0.2s ease;
+        }
+        @keyframes dropdownFade {
+          from {
+            opacity: 0;
+            transform: translateY(-8px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
         }
         .dropdown-item {
-          display: block;
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
           padding: 0.5rem 1.2rem;
           color: #374151;
           text-decoration: none;
           font-size: 0.9rem;
           transition: background 0.15s;
         }
-        .dropdown-item:hover { background: #f9fafb; }
-        .dropdown-item.logout { color: #dc2626; }
-        .dropdown-item.logout:hover { background: #fef2f2; }
-        .dropdown-divider { border: none; border-top: 1px solid #f3f0ff; margin: 0.3rem 0; }
+        .dropdown-item:hover {
+          background: #f9fafb;
+        }
+        .dropdown-item .dropdown-icon {
+          width: 18px;
+          height: 18px;
+          stroke-width: 1.8;
+          color: #6b7280;
+        }
+        .dropdown-item.logout {
+          color: #dc2626;
+        }
+        .dropdown-item.logout .dropdown-icon {
+          color: #dc2626;
+        }
+        .dropdown-item.logout:hover {
+          background: #fef2f2;
+        }
+        .dropdown-divider {
+          border: none;
+          border-top: 1px solid #f1f5f9;
+          margin: 0.3rem 0;
+        }
 
-       /* ===== RESPONSIVE ===== */
+        /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
           .hamburger {
             display: flex;
@@ -386,7 +398,7 @@ export default function Navbar() {
 
           .navbar-links {
             position: fixed;
-            top: 68px;
+            top: 64px;
             left: 0;
             right: 0;
             background: white;
@@ -394,14 +406,14 @@ export default function Navbar() {
             align-items: stretch;
             padding: 1rem 1.5rem;
             gap: 0.5rem;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-            border-bottom: 1px solid #f3f0ff;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+            border-bottom: 1px solid #f1f5f9;
             transform: translateY(-120%);
             opacity: 0;
             pointer-events: none;
             transition: all 0.3s ease;
             z-index: 40;
-            max-height: calc(100vh - 68px);
+            max-height: calc(100vh - 64px);
             overflow-y: auto;
           }
           .navbar-links.open {
@@ -413,16 +425,16 @@ export default function Navbar() {
           .navbar-links a {
             padding: 0.7rem 1rem;
             width: 100%;
-            color: #1f2937; /* gelap, kontras dengan background putih */
+            color: #1f2937;
             font-weight: 500;
             border-radius: 8px;
           }
           .navbar-links a:hover {
-            background: #f5f3ff;
-            color: #7C3AED;
+            background: #f1f5f9;
+            color: #1f2937;
           }
           .navbar-links a.active {
-            background: #7C3AED;
+            background: #1e293b;
             color: white;
           }
 
@@ -435,7 +447,7 @@ export default function Navbar() {
             flex-direction: column;
             gap: 0.5rem;
             margin-top: 0.5rem;
-            padding-top: 0.75rem;
+            padding-top: 0.5rem;
             border-top: 1px solid #e5e7eb;
             width: 100%;
           }
@@ -450,19 +462,19 @@ export default function Navbar() {
             border-color: #d1d5db;
           }
           .navbar-mobile-auth .btn-primary {
-            background: #7C3AED;
+            background: #1e293b;
             color: white;
           }
+
           .mobile-divider {
             border: none;
             border-top: 1px solid #e5e7eb;
             margin: 0.5rem 0;
           }
-
           .mobile-logout-btn {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.6rem;
             padding: 0.7rem 1rem;
             width: 100%;
             background: none;
@@ -475,6 +487,11 @@ export default function Navbar() {
             transition: background 0.2s;
             text-align: left;
           }
+          .mobile-logout-btn .mobile-icon {
+            width: 20px;
+            height: 20px;
+            stroke: #dc2626;
+          }
           .mobile-logout-btn:hover {
             background: #fee2e2;
           }
@@ -486,8 +503,8 @@ export default function Navbar() {
           }
           .mobile-divider,
           .mobile-logout-btn {
-            display: none !important; /* ✅ tambahkan ini */
-          }            
+            display: none !important;
+          }
         }
       `}</style>
     </nav>

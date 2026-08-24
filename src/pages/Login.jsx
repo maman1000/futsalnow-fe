@@ -9,20 +9,17 @@ export default function Login() {
   const { showToast } = useToast();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
     setLoading(true);
     try {
       const user = await login(email, password);
+      showToast("Selamat datang kembali! 🎉", "success");
       navigate(user.role === "admin" ? "/admin" : "/");
     } catch (err) {
-      // setError(err.response?.data?.message || "Login gagal. Coba lagi.");
       const msg = err.response?.data?.message || "Login gagal. Coba lagi.";
-      // setError(msg);
       showToast(msg, "error");
     } finally {
       setLoading(false);
@@ -30,217 +27,225 @@ export default function Login() {
   };
 
   return (
-    <div className="page-content auth-page">
-      <div className="auth-card">
-        <div className="auth-header">
-          <span className="auth-icon">🔐</span>
-          <h2 className="auth-title">Selamat Datang Kembali</h2>
-          <p className="auth-desc">
-            Masuk ke akunmu untuk melanjutkan booking.
-          </p>
-        </div>
+    <div className="login-page">
+      <div className="login-container">
+        <form className="login-form" onSubmit={handleSubmit}>
+          <h1 className="login-title">Masuk</h1>
+          <p className="login-sub">Masuk ke akun Anda untuk melanjutkan.</p>
 
-        {error && <div className="alert alert-error">{error}</div>}
-
-        <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
-            <label className="form-label">📧 Email</label>
-            <input
-              type="email"
-              className="form-input"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="nama@email.com"
-              required
-            />
+            <label className="form-label">Email</label>
+            <div className="input-icon-wrapper">
+              <span className="input-icon">📧</span>
+              <input
+                type="email"
+                className="form-input"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="nama@email.com"
+                required
+              />
+            </div>
           </div>
 
           <div className="form-group">
-            <label className="form-label">🔑 Password</label>
-            <input
-              type="password"
-              className="form-input"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              required
-            />
+            <label className="form-label">Password</label>
+            <div className="input-icon-wrapper">
+              <span className="input-icon">🔒</span>
+              <input
+                type="password"
+                className="form-input"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                required
+              />
+            </div>
           </div>
 
-          <button type="submit" className="btn-submit" disabled={loading}>
+          <div className="login-options">
+            <Link to="/forgot-password" className="forgot-link">
+              Lupa password?
+            </Link>
+          </div>
+
+          <button type="submit" className="login-btn" disabled={loading}>
             {loading ? (
               <>
                 <span className="spinner-sm"></span> Memproses...
               </>
             ) : (
-              "Masuk →"
+              "Masuk"
             )}
           </button>
 
-          <p className="auth-switch">
-            Belum punya akun? <Link to="/register">Daftar sekarang</Link>
+          <p className="login-switch">
+            Belum punya akun? <Link to="/register">Daftar di sini</Link>
           </p>
         </form>
+
+        <div className="login-footer">
+          <span>- FutsalNow -</span>
+          <span>Booking Lapangan Futsal</span>
+          <span>© 2026 FutsalNow</span>
+        </div>
       </div>
 
+      {/* ===== CSS ===== */}
       <style>{`
-        .auth-page {
+        .login-page {
           min-height: 100vh;
           display: flex;
           align-items: center;
           justify-content: center;
-          background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
           padding: 1.5rem;
+          background: #f5f7fa;
         }
 
-        .auth-card {
-          max-width: 420px;
+        .login-container {
           width: 100%;
+          max-width: 420px;
           background: white;
-          border-radius: 32px;
-          padding: 2.5rem 2rem;
-          box-shadow: 0 20px 60px rgba(124,58,237,0.12);
-          border: 1px solid #f3f0ff;
+          border-radius: 16px;
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+          padding: 2.5rem 2rem 1.5rem;
+          border: 1px solid #e8ecf1;
         }
 
-        .auth-header {
-          text-align: center;
-          margin-bottom: 2rem;
-        }
-
-        .auth-icon {
-          font-size: 2.5rem;
-          display: block;
-          margin-bottom: 0.5rem;
-        }
-
-        .auth-title {
-          font-size: 1.8rem;
-          font-weight: 700;
+        /* ===== FORM ===== */
+        .login-title {
+          font-size: 1.5rem;
+          font-weight: 600;
           color: #1f2937;
-          margin-bottom: 0.25rem;
+          text-align: center;
+          margin-bottom: 0.2rem;
         }
-
-        .auth-desc {
+        .login-sub {
+          text-align: center;
           color: #6b7280;
-          font-size: 0.95rem;
-        }
-
-        .auth-form {
-          display: flex;
-          flex-direction: column;
-          gap: 1.25rem;
+          font-size: 0.9rem;
+          margin-bottom: 1.5rem;
         }
 
         .form-group {
-          display: flex;
-          flex-direction: column;
-          gap: 0.3rem;
+          margin-bottom: 1.25rem;
         }
-
         .form-label {
+          display: block;
           font-weight: 500;
           color: #374151;
-          font-size: 0.9rem;
+          font-size: 0.85rem;
+          margin-bottom: 0.3rem;
         }
 
+        .input-icon-wrapper {
+          position: relative;
+          display: flex;
+          align-items: center;
+        }
+        .input-icon {
+          position: absolute;
+          left: 0.7rem;
+          font-size: 1rem;
+          color: #9ca3af;
+          pointer-events: none;
+        }
         .form-input {
-          padding: 0.7rem 1rem;
+          width: 100%;
+          padding: 0.65rem 0.9rem 0.65rem 2.2rem;
           border: 1.5px solid #e5e7eb;
-          border-radius: 14px;
+          border-radius: 8px;
           font-size: 0.95rem;
           transition: 0.2s;
           background: #fafafa;
         }
-
         .form-input:focus {
           outline: none;
-          border-color: #7c3aed;
+          border-color: #1e293b;
           background: white;
-          box-shadow: 0 0 0 4px rgba(124,58,237,0.08);
+          box-shadow: 0 0 0 4px rgba(30, 41, 59, 0.06);
         }
 
-        .btn-submit {
+        .login-options {
+          display: flex;
+          justify-content: flex-end;
+          margin-bottom: 1.5rem;
+        }
+        .forgot-link {
+          font-size: 0.85rem;
+          color: #1e293b;
+          text-decoration: none;
+          font-weight: 500;
+        }
+        .forgot-link:hover {
+          text-decoration: underline;
+        }
+
+        .login-btn {
           width: 100%;
-          padding: 0.8rem;
-          background: #7c3aed;
+          padding: 0.75rem;
+          background: #1e293b;
           color: white;
           border: none;
-          border-radius: 30px;
+          border-radius: 8px;
           font-size: 1rem;
           font-weight: 600;
           cursor: pointer;
-          transition: all 0.2s;
+          transition: 0.2s;
           display: flex;
           align-items: center;
           justify-content: center;
           gap: 0.5rem;
-          margin-top: 0.5rem;
         }
-
-        .btn-submit:hover:not(:disabled) {
-          background: #6d28d9;
-          transform: scale(1.02);
-          box-shadow: 0 8px 24px rgba(124,58,237,0.25);
+        .login-btn:hover:not(:disabled) {
+          background: #0f172a;
         }
-
-        .btn-submit:disabled {
+        .login-btn:disabled {
           opacity: 0.6;
           cursor: not-allowed;
-          transform: none;
         }
 
         .spinner-sm {
           display: inline-block;
           width: 18px;
           height: 18px;
-          border: 2px solid rgba(255,255,255,0.3);
-          border-top-color: white;
+          border: 2px solid rgba(255, 255, 255, 0.3);
+          border-top-color: #1e293b;
           border-radius: 50%;
           animation: spin 0.8s linear infinite;
         }
-
         @keyframes spin {
-          to { transform: rotate(360deg); }
+          to {
+            transform: rotate(360deg);
+          }
         }
 
-        .auth-switch {
+        .login-switch {
           text-align: center;
           font-size: 0.9rem;
           color: #6b7280;
-          margin-top: 0.5rem;
+          margin-top: 1.25rem;
         }
-
-        .auth-switch a {
-          color: #7c3aed;
+        .login-switch a {
+          color: #1e293b;
           font-weight: 500;
           text-decoration: none;
         }
-
-        .auth-switch a:hover {
+        .login-switch a:hover {
           text-decoration: underline;
         }
 
-        .alert {
-          padding: 0.7rem 1rem;
-          border-radius: 14px;
-          font-size: 0.9rem;
-          border-left: 4px solid;
-          margin-bottom: 1rem;
-        }
-        .alert-error {
-          background: #fef2f2;
-          border-color: #dc2626;
-          color: #991b1b;
-        }
-
-        @media (max-width: 480px) {
-          .auth-card {
-            padding: 1.5rem 1.25rem;
-          }
-          .auth-title {
-            font-size: 1.5rem;
-          }
+        /* ===== FOOTER ===== */
+        .login-footer {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 0.2rem;
+          margin-top: 2rem;
+          padding-top: 1rem;
+          border-top: 1px solid #e8ecf1;
+          font-size: 0.75rem;
+          color: #9ca3af;
         }
       `}</style>
     </div>

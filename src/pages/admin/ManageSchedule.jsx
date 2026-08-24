@@ -63,7 +63,7 @@ export default function ManageSchedule() {
     } finally {
       setLoading(false);
     }
-  }, [currentPage, filterService]); // ← tambahkan filterService sebagai dependency
+  }, [currentPage, filterService]);
 
   useEffect(() => {
     fetchData();
@@ -152,13 +152,13 @@ export default function ManageSchedule() {
   const handleFilterChange = (e) => {
     const value = e.target.value;
     setFilterService(value);
-    setCurrentPage(1); // reset ke halaman 1
+    setCurrentPage(1);
   };
 
   return (
     <div className="page-content manage-schedule-page">
       <div className="page-header">
-        <h1 className="page-title">📅 Kelola Jadwal</h1>
+        <h1 className="page-title">Kelola Jadwal</h1>
         <p className="page-subtitle">
           Tambah slot jadwal dan atur ketersediaannya.
         </p>
@@ -170,7 +170,7 @@ export default function ManageSchedule() {
       {/* Form Tambah Jadwal */}
       <div className="form-card">
         <h2 className="form-title">
-          {submitting ? "⏳ Menyimpan..." : "➕ Tambah Jadwal Baru"}
+          {submitting ? "Menyimpan..." : "Tambah Jadwal Baru"}
         </h2>
         <form onSubmit={handleSubmit} className="schedule-form">
           <div className="form-grid">
@@ -248,8 +248,7 @@ export default function ManageSchedule() {
           <select
             className="filter-select"
             value={filterService}
-            // onChange={(e) => setFilterService(e.target.value)}
-            onChange={handleFilterChange} // ← pakai fungsi baru
+            onChange={handleFilterChange}
           >
             <option value="">Semua layanan</option>
             {services.map((s) => (
@@ -277,45 +276,56 @@ export default function ManageSchedule() {
           <p>😕 Belum ada jadwal.</p>
         </div>
       ) : (
-        <div className="schedule-list">
-          {schedules.map((s) => (
-            <div key={s.id} className="schedule-card">
-              <div className="schedule-info">
-                <div className="schedule-main">
-                  <span className="schedule-id">#{s.id}</span>
-                  <span className="schedule-service">
-                    {s.service?.name ||
-                      services.find((v) => v.id === s.service_id)?.name ||
-                      `#${s.service_id}`}
-                  </span>
-                </div>
-                <div className="schedule-details">
-                  <span className="schedule-day">
-                    {namaHari(s.day_of_week)}
-                  </span>
-                  <span className="schedule-time">
-                    {formatJam(s.start_time)} – {formatJam(s.end_time)}
-                  </span>
-                </div>
-              </div>
-              <div className="schedule-meta">
-                <span
-                  className={`badge ${s.is_active ? "badge-active" : "badge-inactive"}`}
-                >
-                  {s.is_active ? "Tersedia" : "Penuh"}
-                </span>
-                <button className="btn-edit" onClick={() => openEditModal(s)}>
-                  ✏️ Edit
-                </button>
-                <button
-                  className={`btn-toggle ${s.is_active ? "btn-close" : "btn-open"}`}
-                  onClick={() => handleToggle(s)}
-                >
-                  {s.is_active ? "Tutup Slot" : "Buka Slot"}
-                </button>
-              </div>
-            </div>
-          ))}
+        <div className="table-wrapper">
+          <table className="table-proka">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Layanan</th>
+                <th>Hari</th>
+                <th>Jam</th>
+                <th>Status</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              {schedules.map((s, index) => (
+                <tr key={s.id}>
+                  <td>
+                    {(pagination.current_page - 1) * pagination.per_page +
+                      index +
+                      1}
+                  </td>
+                  <td>{s.service?.name || "-"}</td>
+                  <td>{namaHari(s.day_of_week)}</td>
+                  <td>
+                    {formatJam(s.start_time)}–{formatJam(s.end_time)}
+                  </td>
+                  <td>
+                    <span
+                      className={`status-badge status-${s.is_active ? "active" : "inactive"}`}
+                    >
+                      {s.is_active ? "Tersedia" : "Penuh"}
+                    </span>
+                  </td>
+                  <td className="table-actions">
+                    <button
+                      className="btn-edit-sm"
+                      onClick={() => openEditModal(s)}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className="btn-toggle-sm"
+                      onClick={() => handleToggle(s)}
+                    >
+                      {s.is_active ? "Tutup" : "Buka"}
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
 
@@ -345,51 +355,59 @@ export default function ManageSchedule() {
       {editingSchedule && (
         <div className="modal-overlay" onClick={closeEditModal}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h3>✏️ Edit Jadwal</h3>
-            <p className="modal-sub">
-              #{editingSchedule.id} ·{" "}
-              {editingSchedule.service?.name || "Layanan"}
-            </p>
-            <form onSubmit={handleEditSubmit}>
-              <div className="form-group">
-                <label className="form-label">Jam Mulai</label>
-                <input
-                  type="time"
-                  name="start_time"
-                  className="form-input"
-                  value={editForm.start_time}
-                  onChange={handleEditChange}
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label className="form-label">Jam Selesai</label>
-                <input
-                  type="time"
-                  name="end_time"
-                  className="form-input"
-                  value={editForm.end_time}
-                  onChange={handleEditChange}
-                  required
-                />
-              </div>
-              <div className="modal-actions">
-                <button
-                  type="button"
-                  className="btn-cancel-modal"
-                  onClick={closeEditModal}
-                >
-                  Batal
-                </button>
-                <button type="submit" className="btn-save-modal">
-                  Simpan
-                </button>
-              </div>
-            </form>
+            <div className="modal-header">
+              <h3>Edit Jadwal</h3>
+              <button className="modal-close" onClick={closeEditModal}>
+                ✕
+              </button>
+            </div>
+            <div className="modal-body">
+              <p className="modal-sub">
+                #{editingSchedule.id} ·{" "}
+                {editingSchedule.service?.name || "Layanan"}
+              </p>
+              <form onSubmit={handleEditSubmit} className="modal-form">
+                <div className="form-group">
+                  <label className="form-label">Jam Mulai</label>
+                  <input
+                    type="time"
+                    name="start_time"
+                    className="form-input"
+                    value={editForm.start_time}
+                    onChange={handleEditChange}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Jam Selesai</label>
+                  <input
+                    type="time"
+                    name="end_time"
+                    className="form-input"
+                    value={editForm.end_time}
+                    onChange={handleEditChange}
+                    required
+                  />
+                </div>
+                <div className="modal-actions">
+                  <button
+                    type="button"
+                    className="btn-modal-cancel"
+                    onClick={closeEditModal}
+                  >
+                    Batal
+                  </button>
+                  <button type="submit" className="btn-modal-save">
+                    Simpan
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}
 
+      {/* ===== CSS ===== */}
       <style>{`
         .manage-schedule-page {
           max-width: 1200px;
@@ -400,14 +418,12 @@ export default function ManageSchedule() {
         .page-header {
           margin-bottom: 2rem;
         }
-
         .page-title {
           font-size: 2rem;
           font-weight: 700;
           color: #1f2937;
           margin-bottom: 0.25rem;
         }
-
         .page-subtitle {
           color: #6b7280;
           font-size: 1rem;
@@ -440,32 +456,27 @@ export default function ManageSchedule() {
           border: 1px solid #f3f0ff;
           margin-bottom: 2rem;
         }
-
         .form-title {
           font-size: 1.3rem;
           font-weight: 600;
           color: #1f2937;
           margin-bottom: 1.5rem;
         }
-
         .form-grid {
           display: grid;
           grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
           gap: 1rem 1.5rem;
         }
-
         .form-group {
           display: flex;
           flex-direction: column;
           gap: 0.3rem;
         }
-
         .form-label {
           font-weight: 500;
           color: #374151;
           font-size: 0.9rem;
         }
-
         .form-input {
           padding: 0.6rem 0.9rem;
           border: 1.5px solid #e5e7eb;
@@ -475,14 +486,12 @@ export default function ManageSchedule() {
           background: #fafafa;
           width: 100%;
         }
-
         .form-input:focus {
           outline: none;
-          border-color: #7c3aed;
+          border-color: #1e293b;
           background: white;
-          box-shadow: 0 0 0 4px rgba(124,58,237,0.08);
+          box-shadow: 0 0 0 4px rgba(30,41,59,0.08);
         }
-
         .form-actions {
           margin-top: 1.5rem;
           display: flex;
@@ -492,7 +501,7 @@ export default function ManageSchedule() {
 
         .btn-submit {
           padding: 0.6rem 2rem;
-          background: #7c3aed;
+          background: #1e293b;
           color: white;
           border: none;
           border-radius: 30px;
@@ -501,34 +510,176 @@ export default function ManageSchedule() {
           cursor: pointer;
           transition: 0.2s;
         }
-
         .btn-submit:hover:not(:disabled) {
-          background: #6d28d9;
+          background: #0f172a;
           transform: scale(1.02);
-          box-shadow: 0 4px 12px rgba(124,58,237,0.25);
+          box-shadow: 0 4px 12px rgba(30,41,59,0.25);
         }
-
         .btn-submit:disabled {
           opacity: 0.6;
           cursor: not-allowed;
         }
 
-        .btn-edit {
-          padding: 0.3rem 1rem;
-          border-radius: 30px;
+        /* Filter */
+        .filter-bar {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          gap: 1rem 1.5rem;
+          background: white;
+          padding: 0.75rem 1.5rem;
+          border-radius: 20px;
+          margin-bottom: 2rem;
+          box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+          border: 1px solid #f3f0ff;
+        }
+        .filter-group {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+        .filter-label {
           font-weight: 500;
-          font-size: 0.8rem;
+          color: #374151;
+          font-size: 0.85rem;
+        }
+        .filter-select {
+          padding: 0.4rem 0.8rem;
+          border: 1.5px solid #e5e7eb;
+          border-radius: 10px;
+          font-size: 0.9rem;
+          background: #fafafa;
+          transition: 0.2s;
+        }
+        .filter-select:focus {
+          outline: none;
+          border-color: #1e293b;
+          box-shadow: 0 0 0 3px rgba(30,41,59,0.08);
+        }
+        .btn-reset {
+          padding: 0.3rem 1rem;
+          background: #f3f4f6;
           border: none;
+          border-radius: 30px;
+          font-size: 0.8rem;
+          font-weight: 500;
+          color: #4b5563;
           cursor: pointer;
           transition: 0.2s;
-          background: #e0e7ff;
-          color: #3730a3;
         }
-        .btn-edit:hover {
-          background: #c7d2fe;
-          transform: scale(1.04);
+        .btn-reset:hover {
+          background: #e5e7eb;
         }
 
+        /* Loading & Empty */
+        .loading-state,
+        .empty-state {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          padding: 4rem 0;
+          color: #6b7280;
+        }
+        .spinner {
+          width: 40px;
+          height: 40px;
+          border: 4px solid #f3f0ff;
+          border-top: 4px solid #1e293b;
+          border-radius: 50%;
+          animation: spin 0.8s linear infinite;
+          margin-bottom: 1rem;
+        }
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+
+        /* ===== TABEL PROKA ===== */
+        .table-wrapper {
+          overflow-x: auto;
+          background: white;
+          border-radius: 16px;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+          border: 1px solid #f0f0f0;
+        }
+        .table-proka {
+          width: 100%;
+          border-collapse: collapse;
+          font-size: 0.9rem;
+        }
+        .table-proka thead {
+          background: #1a1a2e;
+          color: #fff;
+        }
+        .table-proka th {
+          padding: 12px 16px;
+          text-align: left;
+          font-weight: 600;
+          font-size: 0.8rem;
+          text-transform: uppercase;
+          letter-spacing: 0.03em;
+        }
+        .table-proka td {
+          padding: 12px 16px;
+          border-bottom: 1px solid #f0f0f0;
+          vertical-align: middle;
+        }
+        .table-proka tbody tr:hover {
+          background: #f8f9fc;
+        }
+
+        .table-actions {
+          display: flex;
+          gap: 6px;
+          flex-wrap: wrap;
+        }
+        .btn-edit-sm {
+          padding: 4px 12px;
+          border: none;
+          border-radius: 30px;
+          font-size: 0.75rem;
+          font-weight: 500;
+          background: #dbeafe;
+          color: #1e40af;
+          cursor: pointer;
+          transition: 0.2s;
+        }
+        .btn-edit-sm:hover {
+          background: #bfdbfe;
+        }
+        .btn-toggle-sm {
+          padding: 4px 12px;
+          border: none;
+          border-radius: 30px;
+          font-size: 0.75rem;
+          font-weight: 500;
+          background: #fef3c7;
+          color: #92400e;
+          cursor: pointer;
+          transition: 0.2s;
+        }
+        .btn-toggle-sm:hover {
+          background: #fde68a;
+        }
+
+        .status-badge {
+          display: inline-block;
+          padding: 4px 12px;
+          border-radius: 30px;
+          font-size: 0.75rem;
+          font-weight: 600;
+          text-transform: capitalize;
+        }
+        .status-active {
+          background: #d4edda;
+          color: #155724;
+        }
+        .status-inactive {
+          background: #f8d7da;
+          color: #721c24;
+        }
+
+        /* ===== PAGINATION ===== */
         .pagination {
           display: flex;
           justify-content: center;
@@ -548,7 +699,7 @@ export default function ManageSchedule() {
         }
         .page-btn:hover:not(:disabled) {
           background: #f5f3ff;
-          border-color: #7c3aed;
+          border-color: #1e293b;
         }
         .page-btn:disabled {
           opacity: 0.4;
@@ -560,281 +711,128 @@ export default function ManageSchedule() {
           font-size: 0.9rem;
         }
 
-        /* Modal */
+        /* ===== MODAL ===== */
         .modal-overlay {
           position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: rgba(0,0,0,0.4);
+          inset: 0;
+          background: rgba(0, 0, 0, 0.4);
           backdrop-filter: blur(4px);
           display: flex;
           align-items: center;
           justify-content: center;
           z-index: 999;
+          padding: 1rem;
         }
         .modal-content {
           background: white;
-          border-radius: 24px;
-          padding: 2rem 2.5rem;
-          max-width: 420px;
+          border-radius: 16px;
+          max-width: 500px;
           width: 100%;
-          box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+          box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+          overflow: hidden;
+          animation: modalIn 0.25s ease;
         }
-        .modal-content h3 {
-          font-size: 1.4rem;
-          font-weight: 700;
+        @keyframes modalIn {
+          from { opacity: 0; transform: scale(0.95) translateY(20px); }
+          to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .modal-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 1.2rem 1.5rem;
+          border-bottom: 1px solid #f0f0f0;
+          background: #fafafa;
+        }
+        .modal-header h3 {
+          font-size: 1.1rem;
+          font-weight: 600;
           color: #1f2937;
-          margin-bottom: 0.25rem;
+          margin: 0;
+        }
+        .modal-close {
+          background: none;
+          border: none;
+          font-size: 1.2rem;
+          cursor: pointer;
+          color: #6b7280;
+          padding: 0.2rem 0.5rem;
+          border-radius: 6px;
+          transition: 0.2s;
+        }
+        .modal-close:hover {
+          background: #f3f4f6;
+        }
+        .modal-body {
+          padding: 1.5rem;
         }
         .modal-sub {
           color: #6b7280;
-          font-size: 0.9rem;
-          margin-bottom: 1.5rem;
+          font-size: 0.85rem;
+          margin-bottom: 1.2rem;
         }
-        .modal-content .form-group {
-          margin-bottom: 1rem;
+        .modal-form {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 1rem 1.5rem;
         }
-        .modal-content .form-group label {
-          display: block;
+        .modal-form .form-group {
+          display: flex;
+          flex-direction: column;
+          gap: 0.3rem;
+        }
+        .modal-form .form-group .form-label {
           font-weight: 500;
           color: #374151;
-          margin-bottom: 0.3rem;
-          font-size: 0.9rem;
+          font-size: 0.85rem;
+        }
+        .modal-form .form-group .form-input {
+          padding: 0.5rem 0.8rem;
+          border: 1.5px solid #e5e7eb;
+          border-radius: 8px;
+          font-size: 0.95rem;
+          background: #fafafa;
+          transition: 0.2s;
+        }
+        .modal-form .form-group .form-input:focus {
+          outline: none;
+          border-color: #1e293b;
+          background: white;
+          box-shadow: 0 0 0 3px rgba(30,41,59,0.08);
         }
         .modal-actions {
           display: flex;
           gap: 0.75rem;
-          margin-top: 1.5rem;
+          margin-top: 0.5rem;
+          justify-content: flex-end;
         }
-        .modal-actions button {
-          flex: 1;
-          padding: 0.6rem;
-          border-radius: 30px;
-          font-weight: 600;
-          font-size: 0.9rem;
+        .btn-modal-cancel {
+          padding: 0.5rem 1.5rem;
+          background: #f3f4f6;
           border: none;
+          border-radius: 30px;
+          font-weight: 500;
+          color: #4b5563;
           cursor: pointer;
           transition: 0.2s;
         }
-        .btn-cancel-modal {
-          background: #f3f4f6;
-          color: #374151;
-        }
-        .btn-cancel-modal:hover {
+        .btn-modal-cancel:hover {
           background: #e5e7eb;
         }
-        .btn-save-modal {
-          background: #7c3aed;
+        .btn-modal-save {
+          padding: 0.5rem 1.5rem;
+          background: #1e293b;
+          border: none;
+          border-radius: 30px;
+          font-weight: 600;
           color: white;
+          cursor: pointer;
+          transition: 0.2s;
         }
-        .btn-save-modal:hover {
-          background: #6d28d9;
+        .btn-modal-save:hover {
+          background: #0f172a;
           transform: scale(1.02);
-          box-shadow: 0 4px 12px rgba(124,58,237,0.3);
-        }
-
-        /* Filter Bar */
-        .filter-bar {
-          display: flex;
-          flex-wrap: wrap;
-          align-items: center;
-          gap: 1rem 1.5rem;
-          background: white;
-          padding: 0.75rem 1.5rem;
-          border-radius: 20px;
-          margin-bottom: 2rem;
-          box-shadow: 0 4px 16px rgba(0,0,0,0.04);
-          border: 1px solid #f3f0ff;
-        }
-
-        .filter-group {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-        }
-
-        .filter-label {
-          font-weight: 500;
-          color: #374151;
-          font-size: 0.85rem;
-        }
-
-        .filter-select {
-          padding: 0.4rem 0.8rem;
-          border: 1.5px solid #e5e7eb;
-          border-radius: 10px;
-          font-size: 0.9rem;
-          background: #fafafa;
-          transition: 0.2s;
-        }
-
-        .filter-select:focus {
-          outline: none;
-          border-color: #7c3aed;
-          background: white;
-          box-shadow: 0 0 0 3px rgba(124,58,237,0.08);
-        }
-
-        .btn-reset {
-          padding: 0.3rem 1rem;
-          background: #f3f4f6;
-          border: none;
-          border-radius: 30px;
-          font-size: 0.8rem;
-          font-weight: 500;
-          color: #4b5563;
-          cursor: pointer;
-          transition: 0.2s;
-        }
-
-        .btn-reset:hover {
-          background: #e5e7eb;
-        }
-
-        /* Loading & Empty */
-        .loading-state,
-        .empty-state {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          padding: 4rem 0;
-          color: #6b7280;
-        }
-
-        .spinner {
-          width: 40px;
-          height: 40px;
-          border: 4px solid #f3f0ff;
-          border-top: 4px solid #7c3aed;
-          border-radius: 50%;
-          animation: spin 0.8s linear infinite;
-          margin-bottom: 1rem;
-        }
-
-        @keyframes spin {
-          to { transform: rotate(360deg); }
-        }
-
-        /* Schedule List Cards */
-        .schedule-list {
-          display: flex;
-          flex-direction: column;
-          gap: 0.75rem;
-        }
-
-        .schedule-card {
-          background: white;
-          border-radius: 20px;
-          padding: 1rem 1.5rem;
-          box-shadow: 0 4px 16px rgba(0,0,0,0.04);
-          border: 1px solid #f3f0ff;
-          display: flex;
-          flex-wrap: wrap;
-          align-items: center;
-          justify-content: space-between;
-          transition: 0.2s;
-        }
-
-        .schedule-card:hover {
-          box-shadow: 0 8px 24px rgba(124,58,237,0.08);
-          border-color: #d4c4ff;
-        }
-
-        .schedule-info {
-          flex: 1 1 60%;
-          display: flex;
-          flex-direction: column;
-          gap: 0.2rem;
-        }
-
-        .schedule-main {
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-        }
-
-        .schedule-id {
-          font-weight: 600;
-          color: #6b7280;
-          font-size: 0.85rem;
-        }
-
-        .schedule-service {
-          font-weight: 600;
-          color: #1f2937;
-          font-size: 1rem;
-        }
-
-        .schedule-details {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 0.5rem 1.5rem;
-          font-size: 0.9rem;
-          color: #6b7280;
-        }
-
-        .schedule-day {
-          font-weight: 500;
-          color: #374151;
-        }
-
-        .schedule-time {
-          color: #4b5563;
-        }
-
-        .schedule-meta {
-          display: flex;
-          align-items: center;
-          gap: 0.75rem 1.5rem;
-          flex-wrap: wrap;
-        }
-
-        .badge {
-          padding: 0.25rem 0.75rem;
-          border-radius: 30px;
-          font-size: 0.75rem;
-          font-weight: 600;
-          text-transform: capitalize;
-          display: inline-block;
-        }
-        .badge-active {
-          background: #d1fae5;
-          color: #065f46;
-        }
-        .badge-inactive {
-          background: #fee2e2;
-          color: #991b1b;
-        }
-
-        .btn-toggle {
-          padding: 0.3rem 1rem;
-          border-radius: 30px;
-          font-weight: 500;
-          font-size: 0.8rem;
-          border: none;
-          cursor: pointer;
-          transition: 0.2s;
-        }
-
-        .btn-close {
-          background: #fef3c7;
-          color: #92400e;
-        }
-        .btn-close:hover {
-          background: #fde68a;
-          transform: scale(1.04);
-        }
-
-        .btn-open {
-          background: #dbeafe;
-          color: #1e40af;
-        }
-        .btn-open:hover {
-          background: #bfdbfe;
-          transform: scale(1.04);
+          box-shadow: 0 4px 12px rgba(30,41,59,0.25);
         }
 
         @media (max-width: 640px) {
@@ -850,14 +848,18 @@ export default function ManageSchedule() {
           .filter-group {
             flex-wrap: wrap;
           }
-          .schedule-card {
-            flex-direction: column;
-            align-items: stretch;
-            padding: 1rem;
+          .modal-form {
+            grid-template-columns: 1fr;
           }
-          .schedule-meta {
-            justify-content: flex-start;
-            margin-top: 0.5rem;
+          .modal-actions {
+            justify-content: center;
+          }
+          .table-proka {
+            font-size: 0.8rem;
+          }
+          .table-proka th,
+          .table-proka td {
+            padding: 8px 10px;
           }
         }
       `}</style>

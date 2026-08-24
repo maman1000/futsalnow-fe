@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { getMyBookings, cancelBooking, payBooking } from "../../api/bookingApi";
+import { useToast } from "../../context/ToastContext";
 
 const formatRupiah = (n) =>
   new Intl.NumberFormat("id-ID", {
@@ -24,13 +26,28 @@ const formatJam = (t) => (t || "").slice(0, 5);
 
 const METHODS = ["transfer", "cash", "e-wallet"];
 
+const STATUS_FILTERS = [
+  { key: "all", label: "Semua" },
+  { key: "pending", label: "Pending" },
+  { key: "confirmed", label: "Confirmed" },
+  { key: "completed", label: "Completed" },
+  { key: "canceled", label: "Canceled" },
+];
+
 export default function MyBookings() {
+  const { showToast } = useToast();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [info, setInfo] = useState("");
+  const [activeStatus, setActiveStatus] = useState("all");
 
-  // State pagination
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState("transfer");
+  const [bookingToPay, setBookingToPay] = useState(null);
+
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [bookingToCancel, setBookingToCancel] = useState(null);
+
   const [pagination, setPagination] = useState({
     current_page: 1,
     last_page: 1,
@@ -42,14 +59,12 @@ export default function MyBookings() {
   const fetchBookings = useCallback(async () => {
     setLoading(true);
     setError("");
-    setInfo("");
     try {
-      const res = await getMyBookings({ page: currentPage });
-      // res.data bisa langsung array atau pagination object
+      const params = { page: currentPage };
+      const res = await getMyBookings(params);
       const bookingsData = res.data?.data ?? res.data;
       setBookings(Array.isArray(bookingsData) ? bookingsData : []);
 
-      // Jika response berbentuk pagination, ambil info pagination
       if (res.data?.current_page) {
         setPagination({
           current_page: res.data.current_page,
@@ -58,7 +73,6 @@ export default function MyBookings() {
           total: res.data.total,
         });
       } else {
-        // Jika response langsung array, set pagination default (semua di satu halaman)
         setPagination({
           current_page: 1,
           last_page: 1,
@@ -83,57 +97,81 @@ export default function MyBookings() {
     setCurrentPage(page);
   };
 
-  const handlePay = async (booking) => {
-    const method = window.prompt(
-      `Pilih metode pembayaran (${METHODS.join("/")}) untuk booking #${booking.id}:`,
-      "transfer",
-    );
-    if (method === null) return;
-    const normalized = method.trim().toLowerCase();
-    if (!METHODS.includes(normalized)) {
-      setError("Metode tidak valid. Pilih: transfer, cash, atau e-wallet.");
-      return;
-    }
-    setError("");
-    setInfo("");
-    try {
-      await payBooking(booking.id, normalized);
-      setInfo("Pembayaran berhasil dicatat.");
-      await fetchBookings();
-    } catch (err) {
-      setError(err.response?.data?.message || "Pembayaran gagal.");
-    }
+  const handleFilterChange = (key) => {
+    setActiveStatus(key);
+    setCurrentPage(1);
   };
 
-  const handleCancel = async (booking) => {
-    if (
-      !window.confirm(
-        `Batalkan booking #${booking.id}? Slot jadwal akan dibuka kembali.`,
-      )
-    )
-      return;
-    setError("");
-    setInfo("");
+  const handlePay = (booking) => {
+    setBookingToPay(booking);
+    setPaymentMethod("transfer");
+    setShowPaymentModal(true);
+  };
+
+  const submitPayment = async () => {
+    if (!bookingToPay) return;
+    setShowPaymentModal(false);
     try {
-      await cancelBooking(booking.id);
-      setInfo("Booking berhasil dibatalkan.");
+      await payBooking(bookingToPay.id, paymentMethod);
+      showToast("Pembayaran berhasil dicatat.", "success");
       await fetchBookings();
     } catch (err) {
-      setError(err.response?.data?.message || "Gagal membatalkan booking.");
+      showToast(err.response?.data?.message || "Pembayaran gagal.", "error");
     }
+    setBookingToPay(null);
   };
+
+  const handleCancel = (booking) => {
+    setBookingToCancel(booking);
+    setShowConfirmModal(true);
+  };
+
+  const submitCancel = async () => {
+    if (!bookingToCancel) return;
+    setShowConfirmModal(false);
+    try {
+      await cancelBooking(bookingToCancel.id);
+      showToast("Booking berhasil dibatalkan.", "success");
+      await fetchBookings();
+    } catch (err) {
+      showToast(
+        err.response?.data?.message || "Gagal membatalkan booking.",
+        "error",
+      );
+    }
+    setBookingToCancel(null);
+  };
+
+  const getStatusBadge = (status) => {
+    const map = {
+      pending: { label: "Pending", className: "status-pending" },
+      confirmed: { label: "Confirmed", className: "status-confirmed" },
+      completed: { label: "Completed", className: "status-completed" },
+      canceled: { label: "Canceled", className: "status-canceled" },
+    };
+    return map[status] || { label: status, className: "" };
+  };
+
+  const isActive = (status) => status === "pending" || status === "confirmed";
+
+  const filteredBookings =
+    activeStatus === "all"
+      ? bookings
+      : bookings.filter((b) => b.status === activeStatus);
+
+  const counts = bookings.reduce((acc, b) => {
+    acc[b.status] = (acc[b.status] || 0) + 1;
+    return acc;
+  }, {});
 
   return (
-    <div className="page-content my-bookings-page">
+    <div className="my-bookings-page page-content">
       <div className="my-bookings-header">
-        <h1 className="my-bookings-title">📋 Booking Saya</h1>
-        <p className="my-bookings-subtitle">
-          Lihat riwayat dan status semua booking yang kamu buat.
-        </p>
+        <h1 className="my-bookings-title">Booking Saya</h1>
+        <p className="my-bookings-subtitle">Pantau booking-mu di sini!</p>
       </div>
 
       {error && <div className="alert alert-error">{error}</div>}
-      {info && <div className="alert alert-success">{info}</div>}
 
       {loading ? (
         <div className="loading-state">
@@ -142,77 +180,197 @@ export default function MyBookings() {
         </div>
       ) : bookings.length === 0 ? (
         <div className="empty-state">
-          <p>😕 Kamu belum punya booking.</p>
-          <p className="empty-hint">Yuk, booking lapangan sekarang!</p>
+          <p className="empty-icon">📭</p>
+          <p className="empty-title">Belum ada booking</p>
+          <p className="empty-desc">Yuk, booking lapangan sekarang!</p>
+          <Link to="/services" className="btn-primary">
+            Cari Lapangan
+          </Link>
         </div>
       ) : (
         <>
+          <div className="filter-bar">
+            {STATUS_FILTERS.map((filter) => (
+              <button
+                key={filter.key}
+                className={`filter-chip ${activeStatus === filter.key ? "active" : ""}`}
+                onClick={() => handleFilterChange(filter.key)}
+              >
+                {filter.label}
+                {counts[filter.key] !== undefined && filter.key !== "all" && (
+                  <span className="filter-count">{counts[filter.key]}</span>
+                )}
+              </button>
+            ))}
+          </div>
+
           <div className="bookings-list">
-            {bookings.map((b) => (
-              <div key={b.id} className="booking-card">
-                <div className="booking-card-main">
-                  <div className="booking-info">
-                    <h3 className="booking-service">
-                      {b.service?.name || "Lapangan"}
-                    </h3>
-                    <p className="booking-datetime">
+            {filteredBookings.map((b, index) => {
+              const status = getStatusBadge(b.status);
+              const isPending = b.status === "pending";
+              const isPaid = b.payment_status === "paid";
+              return (
+                <div
+                  key={b.id}
+                  className={`booking-card ${isActive(b.status) ? "booking-active" : ""}`}
+                  style={{ animationDelay: `${index * 0.04}s` }}
+                >
+                  <div className="booking-card-header">
+                    <div className="booking-service-info">
+                      <span className="booking-id">#{b.id}</span>
+                      <span className="booking-service-name">
+                        {b.service?.name || "Lapangan"}
+                      </span>
+                    </div>
+                    <span className={`status-badge ${status.className}`}>
+                      {status.label}
+                    </span>
+                  </div>
+
+                  <div className="booking-card-body">
+                    <div className="booking-datetime">
                       <span className="booking-date">
                         {formatTanggal(b.booking_date)}
                       </span>
                       <span className="booking-time">
                         {formatJam(b.start_time)} – {formatJam(b.end_time)}
                       </span>
-                    </p>
+                    </div>
+                    <div className="booking-meta">
+                      <span className="booking-total">
+                        {formatRupiah(b.total_price)}
+                      </span>
+                      <span className="booking-payment-status">
+                        {isPaid ? (
+                          <span className="badge-paid">Lunas</span>
+                        ) : (
+                          <span className="badge-unpaid">Belum Dibayar</span>
+                        )}
+                      </span>
+                    </div>
                   </div>
-                  <div className="booking-meta">
-                    <span className={`badge badge-${b.status}`}>
-                      {b.status}
-                    </span>
-                    <span className="booking-total">
-                      {formatRupiah(b.total_price)}
-                    </span>
-                    <span className="booking-payment">
-                      {b.payment ? (
-                        <span className="payment-info">
-                          <span className="payment-method">
-                            {b.payment.method}
-                          </span>
-                          <span className="payment-date">
-                            ·{" "}
-                            {new Date(b.payment.paid_at).toLocaleDateString(
-                              "id-ID",
-                            )}
-                          </span>
-                        </span>
-                      ) : (
-                        <span className="payment-unpaid">Belum dibayar</span>
-                      )}
-                    </span>
+
+                  <div className="booking-card-actions">
+                    {isPending && !isPaid && (
+                      <button className="btn-pay" onClick={() => handlePay(b)}>
+                        Bayar
+                      </button>
+                    )}
+                    {isPending && (
+                      <button
+                        className="btn-cancel"
+                        onClick={() => handleCancel(b)}
+                      >
+                        Batal
+                      </button>
+                    )}
+                    {!isPending && !isPaid && (
+                      <span className="inactive-action">
+                        Tidak ada yang bisa dilakukan
+                      </span>
+                    )}
                   </div>
                 </div>
-                <div className="booking-actions">
-                  {b.status === "pending" && !b.payment && (
-                    <button
-                      className="btn btn-pay"
-                      onClick={() => handlePay(b)}
+              );
+            })}
+          </div>
+
+          {showPaymentModal && (
+            <div
+              className="modal-overlay"
+              onClick={() => setShowPaymentModal(false)}
+            >
+              <div
+                className="modal-content"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="modal-header">
+                  <h3>Pilih Metode Pembayaran</h3>
+                  <button
+                    className="modal-close"
+                    onClick={() => setShowPaymentModal(false)}
+                  >
+                    ✕
+                  </button>
+                </div>
+                <div className="modal-body">
+                  <p className="modal-sub">
+                    Booking #{bookingToPay?.id} · {bookingToPay?.service?.name}
+                  </p>
+                  <div className="form-group">
+                    <label className="form-label">Metode</label>
+                    <select
+                      className="form-input"
+                      value={paymentMethod}
+                      onChange={(e) => setPaymentMethod(e.target.value)}
                     >
-                      Bayar
-                    </button>
-                  )}
-                  {b.status === "pending" && (
+                      {METHODS.map((m) => (
+                        <option key={m} value={m}>
+                          {m}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="modal-actions">
                     <button
-                      className="btn btn-cancel"
-                      onClick={() => handleCancel(b)}
+                      className="btn-cancel-modal"
+                      onClick={() => setShowPaymentModal(false)}
                     >
                       Batal
                     </button>
-                  )}
+                    <button
+                      className="btn-confirm-modal"
+                      onClick={submitPayment}
+                    >
+                      Bayar
+                    </button>
+                  </div>
                 </div>
               </div>
-            ))}
-          </div>
+            </div>
+          )}
 
-          {/* PAGINATION */}
+          {showConfirmModal && (
+            <div
+              className="modal-overlay"
+              onClick={() => setShowConfirmModal(false)}
+            >
+              <div
+                className="modal-content"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="modal-header">
+                  <h3>Konfirmasi Pembatalan</h3>
+                  <button
+                    className="modal-close"
+                    onClick={() => setShowConfirmModal(false)}
+                  >
+                    ✕
+                  </button>
+                </div>
+                <div className="modal-body">
+                  <p className="modal-sub">
+                    Batalkan booking #{bookingToCancel?.id}?
+                  </p>
+                  <p className="modal-desc">
+                    Slot jadwal akan dibuka kembali untuk pengguna lain.
+                  </p>
+                  <div className="modal-actions">
+                    <button
+                      className="btn-cancel-modal"
+                      onClick={() => setShowConfirmModal(false)}
+                    >
+                      Kembali
+                    </button>
+                    <button className="btn-danger-modal" onClick={submitCancel}>
+                      Ya, Batalkan
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {pagination.last_page > 1 && (
             <div className="pagination">
               <button
@@ -237,46 +395,40 @@ export default function MyBookings() {
         </>
       )}
 
-      {/* CSS inline */}
+      {/* ===== CSS ===== */}
       <style>{`
         .my-bookings-page {
-          max-width: 1000px;
+          max-width: 900px;
           margin: 0 auto;
           padding: 2rem 1.5rem;
+          position: relative;
         }
 
         .my-bookings-header {
-          margin-bottom: 2rem;
+          margin-bottom: 1.5rem;
         }
-
         .my-bookings-title {
-          font-size: 2rem;
+          font-size: 1.8rem;
           font-weight: 700;
           color: #1f2937;
-          margin-bottom: 0.25rem;
+          margin-bottom: 0.1rem;
         }
-
         .my-bookings-subtitle {
           color: #6b7280;
-          font-size: 1rem;
+          font-size: 0.95rem;
         }
 
         .alert {
           padding: 0.75rem 1rem;
-          border-radius: 14px;
+          border-radius: 12px;
           font-size: 0.9rem;
           margin-bottom: 1.5rem;
           border-left: 4px solid;
         }
         .alert-error {
-          background: #fef2f2;
+          background: #fee2e2;
           border-color: #dc2626;
           color: #991b1b;
-        }
-        .alert-success {
-          background: #f0fdf4;
-          border-color: #22c55e;
-          color: #166534;
         }
 
         .loading-state {
@@ -290,24 +442,87 @@ export default function MyBookings() {
           width: 40px;
           height: 40px;
           border: 4px solid #f3f0ff;
-          border-top: 4px solid #7c3aed;
+          border-top: 4px solid #1e293b;
           border-radius: 50%;
           animation: spin 0.8s linear infinite;
           margin-bottom: 1rem;
         }
         @keyframes spin {
-          to { transform: rotate(360deg); }
+          to {
+            transform: rotate(360deg);
+          }
         }
 
         .empty-state {
           text-align: center;
-          padding: 4rem 0;
-          color: #6b7280;
+          padding: 3rem 2rem;
+          background: white;
+          border-radius: 24px;
+          border: 1px solid #f3f0ff;
         }
-        .empty-hint {
-          font-size: 0.9rem;
-          margin-top: 0.5rem;
-          color: #9ca3af;
+        .empty-icon {
+          font-size: 3rem;
+          margin-bottom: 0.5rem;
+        }
+        .empty-title {
+          font-size: 1.2rem;
+          font-weight: 600;
+          color: #1f2937;
+          margin-bottom: 0.25rem;
+        }
+        .empty-desc {
+          color: #6b7280;
+          margin-bottom: 1.5rem;
+        }
+        .btn-primary {
+          display: inline-block;
+          padding: 0.6rem 1.5rem;
+          background: #1e293b;
+          color: white;
+          border-radius: 30px;
+          font-weight: 600;
+          text-decoration: none;
+          transition: 0.25s;
+        }
+        .btn-primary:hover {
+          background: #0f172a;
+          transform: translateY(-2px);
+        }
+
+        .filter-bar {
+          display: flex;
+          gap: 0.5rem;
+          flex-wrap: wrap;
+          margin-bottom: 1.2rem;
+        }
+        .filter-chip {
+          display: flex;
+          align-items: center;
+          gap: 0.3rem;
+          padding: 0.3rem 1rem;
+          border: 1.5px solid #e5e7eb;
+          border-radius: 30px;
+          background: white;
+          font-size: 0.8rem;
+          font-weight: 500;
+          color: #4b5563;
+          cursor: pointer;
+          transition: 0.2s;
+        }
+        .filter-chip:hover {
+          border-color: #1e293b;
+        }
+        .filter-chip.active {
+          background: #1e293b;
+          color: white;
+          border-color: #1e293b;
+        }
+        .filter-count {
+          background: rgba(255, 255, 255, 0.2);
+          padding: 0.05rem 0.4rem;
+          border-radius: 30px;
+          font-size: 0.65rem;
+          font-weight: 600;
         }
 
         .bookings-list {
@@ -318,152 +533,283 @@ export default function MyBookings() {
 
         .booking-card {
           background: white;
-          border-radius: 20px;
-          padding: 1.25rem 1.5rem;
-          box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+          border-radius: 16px;
+          padding: 1.1rem 1.25rem;
+          box-shadow: 0 4px 16px rgba(30, 41, 59, 0.04);
           border: 1px solid #f3f0ff;
-          display: flex;
-          flex-wrap: wrap;
-          align-items: center;
-          justify-content: space-between;
-          transition: 0.2s;
+          transition: all 0.25s ease;
+          opacity: 0;
+          animation: fadeInUp 0.4s ease forwards;
         }
-
         .booking-card:hover {
-          box-shadow: 0 8px 24px rgba(124,58,237,0.08);
+          box-shadow: 0 8px 30px rgba(30, 41, 59, 0.06);
           border-color: #d4c4ff;
         }
+        .booking-active {
+          border-color: #1e293b;
+          box-shadow: 0 4px 20px rgba(30, 41, 59, 0.06);
+        }
 
-        .booking-card-main {
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(12px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .booking-card-header {
           display: flex;
-          flex-wrap: wrap;
+          justify-content: space-between;
           align-items: center;
-          gap: 1rem 2rem;
-          flex: 1 1 60%;
-        }
-
-        .booking-info {
-          flex: 1 1 180px;
-        }
-
-        .booking-service {
-          font-weight: 600;
-          color: #1f2937;
-          font-size: 1.1rem;
-          margin: 0;
-        }
-
-        .booking-datetime {
-          display: flex;
+          margin-bottom: 0.4rem;
           flex-wrap: wrap;
-          gap: 0.5rem 1rem;
-          font-size: 0.85rem;
+          gap: 0.4rem;
+        }
+        .booking-service-info {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+        .booking-id {
+          font-weight: 600;
           color: #6b7280;
-          margin-top: 0.2rem;
+          font-size: 0.8rem;
         }
-
-        .booking-time {
-          font-weight: 500;
-          color: #4b5563;
-        }
-
-        .booking-meta {
-          display: flex;
-          flex-wrap: wrap;
-          align-items: center;
-          gap: 0.75rem 1.5rem;
-        }
-
-        .badge {
-          padding: 0.25rem 0.75rem;
-          border-radius: 30px;
-          font-size: 0.75rem;
-          font-weight: 600;
-          text-transform: capitalize;
-          display: inline-block;
-          background: #e5e7eb;
-          color: #374151;
-        }
-        .badge-pending {
-          background: #fef3c7;
-          color: #92400e;
-        }
-        .badge-confirmed {
-          background: #dbeafe;
-          color: #1e40af;
-        }
-        .badge-completed {
-          background: #d1fae5;
-          color: #065f46;
-        }
-        .badge-canceled {
-          background: #fee2e2;
-          color: #991b1b;
-        }
-
-        .booking-total {
+        .booking-service-name {
           font-weight: 600;
           color: #1f2937;
           font-size: 0.95rem;
         }
 
-        .booking-payment {
-          font-size: 0.85rem;
-          color: #6b7280;
-        }
-        .payment-unpaid {
-          color: #9ca3af;
-          font-weight: 500;
-        }
-        .payment-method {
-          font-weight: 500;
-          color: #374151;
-        }
-        .payment-date {
-          color: #9ca3af;
-        }
-
-        .booking-actions {
-          display: flex;
-          gap: 0.5rem;
-          flex-wrap: wrap;
-          margin-left: auto;
-        }
-
-        .btn {
-          padding: 0.4rem 1rem;
+        .status-badge {
+          padding: 0.15rem 0.7rem;
           border-radius: 30px;
-          font-weight: 500;
-          font-size: 0.85rem;
-          border: none;
-          cursor: pointer;
-          transition: all 0.2s;
-          text-decoration: none;
-          display: inline-flex;
-          align-items: center;
-          gap: 0.3rem;
+          font-size: 0.65rem;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.03em;
         }
-
-        .btn-pay {
-          background: #7c3aed;
-          color: white;
+        .status-pending {
+          background: #fef3c7;
+          color: #92400e;
         }
-        .btn-pay:hover {
-          background: #6d28d9;
-          transform: scale(1.04);
-          box-shadow: 0 4px 12px rgba(124,58,237,0.3);
+        .status-confirmed {
+          background: #dbeafe;
+          color: #1e40af;
         }
-
-        .btn-cancel {
+        .status-completed {
+          background: #d1fae5;
+          color: #065f46;
+        }
+        .status-canceled {
           background: #fee2e2;
           color: #991b1b;
         }
-        .btn-cancel:hover {
-          background: #fecaca;
-          transform: scale(1.04);
+
+        .booking-card-body {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: space-between;
+          align-items: center;
+          gap: 0.4rem 0.8rem;
+          margin-bottom: 0.6rem;
+        }
+        .booking-datetime {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.4rem 0.8rem;
+          font-size: 0.85rem;
+          color: #6b7280;
+        }
+        .booking-time {
+          font-weight: 500;
+          color: #4b5563;
+        }
+        .booking-meta {
+          display: flex;
+          align-items: center;
+          gap: 0.6rem 1rem;
+          flex-wrap: wrap;
+        }
+        .booking-total {
+          font-weight: 700;
+          color: #1f2937;
+          font-size: 0.95rem;
+        }
+        .booking-payment-status {
+          font-size: 0.8rem;
+        }
+        .badge-paid {
+          padding: 0.1rem 0.5rem;
+          border-radius: 30px;
+          background: #d1fae5;
+          color: #065f46;
+          font-weight: 600;
+        }
+        .badge-unpaid {
+          padding: 0.1rem 0.5rem;
+          border-radius: 30px;
+          background: #fef3c7;
+          color: #92400e;
+          font-weight: 600;
         }
 
-        /* Pagination */
+        .booking-card-actions {
+          display: flex;
+          gap: 0.5rem;
+          flex-wrap: wrap;
+          border-top: 1px solid #f3f4f6;
+          padding-top: 0.6rem;
+        }
+        .btn-pay {
+          padding: 0.25rem 1rem;
+          background: #1e293b;
+          color: white;
+          border-radius: 30px;
+          font-weight: 600;
+          font-size: 0.8rem;
+          border: none;
+          cursor: pointer;
+          transition: 0.2s;
+        }
+        .btn-pay:hover {
+          background: #0f172a;
+          transform: scale(1.03);
+        }
+        .btn-cancel {
+          padding: 0.25rem 1rem;
+          background: #fee2e2;
+          color: #991b1b;
+          border-radius: 30px;
+          font-weight: 600;
+          font-size: 0.8rem;
+          border: none;
+          cursor: pointer;
+          transition: 0.2s;
+        }
+        .btn-cancel:hover {
+          background: #fecaca;
+          transform: scale(1.03);
+        }
+        .inactive-action {
+          font-size: 0.8rem;
+          color: #9ca3af;
+        }
+
+        /* ===== MODAL ===== */
+        .modal-overlay {
+          position: fixed;
+          inset: 0;
+          background: rgba(0, 0, 0, 0.4);
+          backdrop-filter: blur(4px);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 999;
+          padding: 1rem;
+        }
+
+        .modal-content {
+          background: white;
+          border-radius: 24px;
+          max-width: 420px;
+          width: 100%;
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+          overflow: hidden;
+          animation: modalIn 0.25s ease;
+        }
+
+        @keyframes modalIn {
+          from {
+            opacity: 0;
+            transform: scale(0.95) translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+          }
+        }
+
+        .modal-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 1.2rem 1.5rem;
+          border-bottom: 1px solid #f0f0f0;
+          background: #fafafa;
+        }
+        .modal-header h3 {
+          font-size: 1.1rem;
+          font-weight: 600;
+          color: #1f2937;
+          margin: 0;
+        }
+        .modal-close {
+          background: none;
+          border: none;
+          font-size: 1.2rem;
+          cursor: pointer;
+          color: #6b7280;
+          padding: 0.2rem 0.5rem;
+          border-radius: 6px;
+          transition: 0.2s;
+        }
+        .modal-close:hover {
+          background: #f3f4f6;
+        }
+
+        .modal-body {
+          padding: 1.5rem;
+        }
+        .modal-sub {
+          color: #6b7280;
+          font-size: 0.9rem;
+          margin-bottom: 1.2rem;
+        }
+        .modal-actions {
+          display: flex;
+          gap: 0.75rem;
+          margin-top: 1.5rem;
+        }
+        .modal-actions button {
+          flex: 1;
+          padding: 0.6rem;
+          border-radius: 30px;
+          font-weight: 600;
+          font-size: 0.9rem;
+          border: none;
+          cursor: pointer;
+          transition: 0.2s;
+        }
+        .btn-cancel-modal {
+          background: #f3f4f6;
+          color: #374151;
+        }
+        .btn-cancel-modal:hover {
+          background: #e5e7eb;
+        }
+        .btn-confirm-modal {
+          background: #1e293b;
+          color: white;
+        }
+        .btn-confirm-modal:hover {
+          background: #0f172a;
+          transform: scale(1.02);
+        }
+        .btn-danger-modal {
+          background: #ef4444;
+          color: white;
+        }
+        .btn-danger-modal:hover {
+          background: #dc2626;
+          transform: scale(1.02);
+        }
+
+        /* ===== PAGINATION ===== */
         .pagination {
           display: flex;
           justify-content: center;
@@ -483,7 +829,7 @@ export default function MyBookings() {
         }
         .page-btn:hover:not(:disabled) {
           background: #f5f3ff;
-          border-color: #7c3aed;
+          border-color: #1e293b;
         }
         .page-btn:disabled {
           opacity: 0.4;
@@ -497,23 +843,26 @@ export default function MyBookings() {
 
         @media (max-width: 640px) {
           .booking-card {
+            padding: 0.9rem 1rem;
+          }
+          .booking-card-header {
             flex-direction: column;
             align-items: stretch;
-            padding: 1rem;
           }
-          .booking-card-main {
+          .booking-card-body {
             flex-direction: column;
             align-items: stretch;
-            gap: 0.5rem;
           }
-          .booking-meta {
-            justify-content: flex-start;
-            gap: 0.5rem;
+          .booking-datetime {
+            flex-direction: column;
+            gap: 0.2rem;
           }
-          .booking-actions {
-            margin-left: 0;
-            margin-top: 0.5rem;
-            justify-content: flex-start;
+          .filter-bar {
+            gap: 0.3rem;
+          }
+          .filter-chip {
+            padding: 0.2rem 0.7rem;
+            font-size: 0.7rem;
           }
         }
       `}</style>

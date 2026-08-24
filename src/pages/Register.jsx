@@ -13,7 +13,6 @@ export default function Register() {
     password: "",
     password_confirmation: "",
   });
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) =>
@@ -21,269 +20,260 @@ export default function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
     setLoading(true);
     try {
       const user = await register(form);
+      showToast("Akun berhasil dibuat! Silakan login. 🎉", "success");
       navigate(user.role === "admin" ? "/admin" : "/");
     } catch (err) {
       const data = err.response?.data;
       const firstFieldError = data?.errors
         ? Object.values(data.errors)[0]?.[0]
         : null;
-      // setError(
-      //   firstFieldError || data?.message || "Registrasi gagal. Coba lagi.",
-      // );
       const msg =
         firstFieldError || data?.message || "Registrasi gagal. Coba lagi.";
-      showToast(msg, "error"); // <-- TAMBAHKAN
+      showToast(msg, "error");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="page-content auth-page">
-      <div className="auth-card">
-        <div className="auth-header">
-          <span className="auth-icon">✨</span>
-          <h2 className="auth-title">Daftar Akun Baru</h2>
-          <p className="auth-desc">
-            Gratis, hanya butuh 1 menit untuk mulai booking.
-          </p>
-        </div>
+    <div className="register-page">
+      <div className="register-container">
+        <form className="register-form" onSubmit={handleSubmit}>
+          <h1 className="register-title">Daftar</h1>
+          <p className="register-sub">Buat akun baru untuk mulai booking.</p>
 
-        {error && <div className="alert alert-error">{error}</div>}
-
-        <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
-            <label className="form-label">👤 Nama Lengkap</label>
-            <input
-              type="text"
-              name="name"
-              className="form-input"
-              value={form.name}
-              onChange={handleChange}
-              placeholder="Nama kamu"
-              required
-            />
+            <label className="form-label">Nama Lengkap</label>
+            <div className="input-icon-wrapper">
+              <span className="input-icon">👤</span>
+              <input
+                type="text"
+                name="name"
+                className="form-input"
+                value={form.name}
+                onChange={handleChange}
+                placeholder="Masukan nama lengkap"
+                required
+              />
+            </div>
           </div>
 
           <div className="form-group">
-            <label className="form-label">📧 Email</label>
-            <input
-              type="email"
-              name="email"
-              className="form-input"
-              value={form.email}
-              onChange={handleChange}
-              placeholder="nama@email.com"
-              required
-            />
+            <label className="form-label">Email</label>
+            <div className="input-icon-wrapper">
+              <span className="input-icon">📧</span>
+              <input
+                type="email"
+                name="email"
+                className="form-input"
+                value={form.email}
+                onChange={handleChange}
+                placeholder="Masukan email"
+                required
+              />
+            </div>
           </div>
 
           <div className="form-group">
-            <label className="form-label">🔑 Password (min. 8 karakter)</label>
-            <input
-              type="password"
-              name="password"
-              className="form-input"
-              value={form.password}
-              onChange={handleChange}
-              placeholder="••••••••"
-              minLength="8"
-              required
-            />
+            <label className="form-label">Password</label>
+            <div className="input-icon-wrapper">
+              <span className="input-icon">🔒</span>
+              <input
+                type="password"
+                name="password"
+                className="form-input"
+                value={form.password}
+                onChange={handleChange}
+                placeholder="Masukan password"
+                minLength="8"
+                required
+              />
+            </div>
           </div>
 
           <div className="form-group">
-            <label className="form-label">🔁 Konfirmasi Password</label>
-            <input
-              type="password"
-              name="password_confirmation"
-              className="form-input"
-              value={form.password_confirmation}
-              onChange={handleChange}
-              placeholder="••••••••"
-              minLength="8"
-              required
-            />
+            <label className="form-label">Konfirmasi Password</label>
+            <div className="input-icon-wrapper">
+              <span className="input-icon">🔑</span>
+              <input
+                type="password"
+                name="password_confirmation"
+                className="form-input"
+                value={form.password_confirmation}
+                onChange={handleChange}
+                placeholder="Ulangi password"
+                minLength="8"
+                required
+              />
+            </div>
           </div>
 
-          <button type="submit" className="btn-submit" disabled={loading}>
+          <button type="submit" className="register-btn" disabled={loading}>
             {loading ? (
               <>
                 <span className="spinner-sm"></span> Memproses...
               </>
             ) : (
-              "Daftar →"
+              "Daftar"
             )}
           </button>
 
-          <p className="auth-switch">
-            Sudah punya akun? <Link to="/login">Login di sini</Link>
+          <p className="register-switch">
+            Sudah punya akun? <Link to="/login">Masuk di sini</Link>
           </p>
         </form>
+
+        <div className="register-footer">
+          <span>- FutsalNow -</span>
+          <span>Booking Lapangan Futsal</span>
+          <span>© 2026 FutsalNow</span>
+        </div>
       </div>
 
+      {/* ===== CSS ===== */}
       <style>{`
-        .auth-page {
+        .register-page {
           min-height: 100vh;
           display: flex;
           align-items: center;
           justify-content: center;
-          background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
           padding: 1.5rem;
+          background: #f5f7fa;
         }
 
-        .auth-card {
-          max-width: 420px;
+        .register-container {
           width: 100%;
+          max-width: 420px;
           background: white;
-          border-radius: 32px;
-          padding: 2.5rem 2rem;
-          box-shadow: 0 20px 60px rgba(124,58,237,0.12);
-          border: 1px solid #f3f0ff;
+          border-radius: 16px;
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+          padding: 2.5rem 2rem 1.5rem;
+          border: 1px solid #e8ecf1;
         }
 
-        .auth-header {
-          text-align: center;
-          margin-bottom: 2rem;
-        }
-
-        .auth-icon {
-          font-size: 2.5rem;
-          display: block;
-          margin-bottom: 0.5rem;
-        }
-
-        .auth-title {
-          font-size: 1.8rem;
-          font-weight: 700;
+        /* ===== FORM ===== */
+        .register-title {
+          font-size: 1.5rem;
+          font-weight: 600;
           color: #1f2937;
-          margin-bottom: 0.25rem;
+          text-align: center;
+          margin-bottom: 0.2rem;
         }
-
-        .auth-desc {
+        .register-sub {
+          text-align: center;
           color: #6b7280;
-          font-size: 0.95rem;
-        }
-
-        .auth-form {
-          display: flex;
-          flex-direction: column;
-          gap: 1.25rem;
+          font-size: 0.9rem;
+          margin-bottom: 1.5rem;
         }
 
         .form-group {
-          display: flex;
-          flex-direction: column;
-          gap: 0.3rem;
+          margin-bottom: 1.25rem;
         }
-
         .form-label {
+          display: block;
           font-weight: 500;
           color: #374151;
-          font-size: 0.9rem;
+          font-size: 0.85rem;
+          margin-bottom: 0.3rem;
         }
 
+        .input-icon-wrapper {
+          position: relative;
+          display: flex;
+          align-items: center;
+        }
+        .input-icon {
+          position: absolute;
+          left: 0.7rem;
+          font-size: 1rem;
+          color: #9ca3af;
+          pointer-events: none;
+        }
         .form-input {
-          padding: 0.7rem 1rem;
+          width: 100%;
+          padding: 0.65rem 0.9rem 0.65rem 2.2rem;
           border: 1.5px solid #e5e7eb;
-          border-radius: 14px;
+          border-radius: 8px;
           font-size: 0.95rem;
           transition: 0.2s;
           background: #fafafa;
         }
-
         .form-input:focus {
           outline: none;
-          border-color: #7c3aed;
+          border-color: #1e293b;
           background: white;
-          box-shadow: 0 0 0 4px rgba(124,58,237,0.08);
+          box-shadow: 0 0 0 4px rgba(30, 41, 59, 0.06);
         }
 
-        .btn-submit {
+        .register-btn {
           width: 100%;
-          padding: 0.8rem;
-          background: #7c3aed;
+          padding: 0.75rem;
+          background: #1e293b;
           color: white;
           border: none;
-          border-radius: 30px;
+          border-radius: 8px;
           font-size: 1rem;
           font-weight: 600;
           cursor: pointer;
-          transition: all 0.2s;
+          transition: 0.2s;
+          margin-top: 0.5rem;
           display: flex;
           align-items: center;
           justify-content: center;
           gap: 0.5rem;
-          margin-top: 0.5rem;
         }
-
-        .btn-submit:hover:not(:disabled) {
-          background: #6d28d9;
-          transform: scale(1.02);
-          box-shadow: 0 8px 24px rgba(124,58,237,0.25);
+        .register-btn:hover:not(:disabled) {
+          background: #0f172a;
         }
-
-        .btn-submit:disabled {
+        .register-btn:disabled {
           opacity: 0.6;
           cursor: not-allowed;
-          transform: none;
         }
 
         .spinner-sm {
           display: inline-block;
           width: 18px;
           height: 18px;
-          border: 2px solid rgba(255,255,255,0.3);
-          border-top-color: white;
+          border: 2px solid rgba(255, 255, 255, 0.3);
+          border-top-color: #1e293b;
           border-radius: 50%;
           animation: spin 0.8s linear infinite;
         }
-
         @keyframes spin {
-          to { transform: rotate(360deg); }
+          to {
+            transform: rotate(360deg);
+          }
         }
 
-        .auth-switch {
+        .register-switch {
           text-align: center;
           font-size: 0.9rem;
           color: #6b7280;
-          margin-top: 0.5rem;
+          margin-top: 1.25rem;
         }
-
-        .auth-switch a {
-          color: #7c3aed;
+        .register-switch a {
+          color: #1e293b;
           font-weight: 500;
           text-decoration: none;
         }
-
-        .auth-switch a:hover {
+        .register-switch a:hover {
           text-decoration: underline;
         }
 
-        .alert {
-          padding: 0.7rem 1rem;
-          border-radius: 14px;
-          font-size: 0.9rem;
-          border-left: 4px solid;
-          margin-bottom: 1rem;
-        }
-        .alert-error {
-          background: #fef2f2;
-          border-color: #dc2626;
-          color: #991b1b;
-        }
-
-        @media (max-width: 480px) {
-          .auth-card {
-            padding: 1.5rem 1.25rem;
-          }
-          .auth-title {
-            font-size: 1.5rem;
-          }
+        /* ===== FOOTER ===== */
+        .register-footer {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 0.2rem;
+          margin-top: 2rem;
+          padding-top: 1rem;
+          border-top: 1px solid #e8ecf1;
+          font-size: 0.75rem;
+          color: #9ca3af;
         }
       `}</style>
     </div>
