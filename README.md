@@ -1,43 +1,89 @@
-# ⚽ FutsalNow - Frontend
+# ⚽ FutsalNow
 
-![Vercel](https://img.shields.io/badge/Deployed-Vercel-000?style=flat&logo=vercel)
-![React](https://img.shields.io/badge/React-18-61DAFB?style=flat&logo=react)
-![Vite](https://img.shields.io/badge/Vite-5-646CFF?style=flat&logo=vite)
+![React](https://img.shields.io/badge/React-18-61DAFB?style=flat&logo=react&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-5-646CFF?style=flat&logo=vite&logoColor=white)
+![React Router](https://img.shields.io/badge/React_Router-6-CA4245?style=flat&logo=react-router&logoColor=white)
+![Axios](https://img.shields.io/badge/Axios-HTTP_Client-5A29E4?style=flat)
 
-Frontend aplikasi booking lapangan futsal **FutsalNow**. Dibangun dengan React 18 + Vite.
+Frontend aplikasi booking lapangan futsal **FutsalNow**.
 
-🌐 **Live Demo:** [https://futsalnow-fe.vercel.app](https://futsalnow-fe.vercel.app)
+FutsalNow memungkinkan customer melihat lapangan yang tersedia, memilih jadwal, melakukan booking, serta mengelola booking mereka. Aplikasi juga dilengkapi dengan dashboard admin untuk mengelola layanan, jadwal, booking, dan laporan.
+
+Dibangun menggunakan **React 18 + Vite** dengan custom CSS dan desain yang sederhana serta responsif.
+
+🌐 **Live Demo:** https://futsalnow-fe.vercel.app
 
 ---
 
 ## 📌 Fitur
 
 ### 👤 Customer
-- Registrasi & Login
-- Lihat daftar lapangan futsal
-- Booking dengan pilih tanggal, jam mulai, dan durasi (1-4 jam)
-- Lihat riwayat booking (My Bookings)
-- Batalkan booking
-- Bayar booking (dummy)
+
+- Registrasi dan login
+- Melihat daftar lapangan futsal
+- Melihat detail lapangan
+- Memilih tanggal booking
+- Memilih jam dan durasi booking
+- Melakukan booking lapangan
+- Melihat riwayat booking
+- Membatalkan booking
+- Melakukan pembayaran simulasi
 
 ### 🔧 Admin
-- Dashboard statistik
-- Kelola semua booking (konfirmasi, batalkan, tandai selesai)
-- Kelola layanan (tambah, edit, hapus, toggle status)
-- Kelola jadwal operasional (tambah, edit jam, buka/tutup slot)
-- Laporan booking
+
+- Dashboard
+- Mengelola booking
+- Mengonfirmasi booking
+- Membatalkan booking
+- Menandai booking selesai
+- Mengelola layanan/lapangan
+- Menambah, mengubah, dan menghapus layanan
+- Mengaktifkan atau menonaktifkan layanan
+- Mengelola jadwal operasional
+- Mengatur jam operasional
+- Mengelola laporan booking
+
+---
+
+## 🎨 Design System
+
+FutsalNow menggunakan desain yang sederhana, bersih, dan berorientasi pada aplikasi.
+
+| Elemen | Nilai |
+|---|---|
+| Primary Green | `#16A34A` |
+| Dark | `#0F172A` |
+| Muted | `#64748B` |
+| Background | `#F8FAFC` |
+| White | `#FFFFFF` |
+| Border | `#E2E8F0` |
+| Card Radius | `12px` |
+| Button Radius | `8px` |
+| Input Radius | `8px` |
+| Font | Inter |
+
+Prinsip desain:
+
+- Minimal dan sederhana
+- Responsive
+- Minimal shadow
+- Tidak menggunakan excessive gradients
+- Tidak menggunakan fake statistics
+- Tidak menggunakan fake badges
+- Menampilkan data aplikasi yang sebenarnya
 
 ---
 
 ## 🛠️ Tech Stack
 
-| **Komponen** | **Teknologi** |
-|--------------|---------------|
+| Komponen | Teknologi |
+|---|---|
 | Framework | React 18 |
 | Build Tool | Vite 5 |
 | Routing | React Router DOM 6 |
 | HTTP Client | Axios |
-| Styling | CSS Custom (tema ungu) |
+| Styling | Custom CSS |
+| Font | Inter |
 | Deployment | Vercel |
 
 ---
@@ -45,6 +91,7 @@ Frontend aplikasi booking lapangan futsal **FutsalNow**. Dibangun dengan React 1
 ## 🚀 Instalasi Lokal
 
 ### 1. Clone Repository
+
 ```bash
 git clone https://github.com/maman1000/futsalnow-fe.git
 cd futsalnow-fe
@@ -62,7 +109,7 @@ Buat file `.env` di root project:
 VITE_API_URL=http://localhost:8000/api
 ```
 
-> **Catatan:** Untuk production, ganti dengan URL backend di Railway.
+> **Catatan:** Untuk production, gunakan URL backend production.
 
 ### 4. Jalankan Development Server
 ```bash
@@ -78,32 +125,38 @@ Aplikasi berjalan di `http://localhost:5173`
 ```
 src/
 ├── api/
-│   ├── client.js          # Axios instance
-│   └── bookingApi.js      # API functions
+│   ├── client.js
+│   └── bookingApi.js
+│
 ├── components/
-│   ├── Navbar.jsx         # Navigasi (responsif dengan hamburger)
-│   ├── ProtectedRoute.jsx # Proteksi route
-│   ├── ServiceCard.jsx    # Card lapangan
-│   └── Toast.jsx          # Notifikasi toast
+│   ├── Navbar.jsx
+│   ├── Footer.jsx
+│   ├── ProtectedRoute.jsx
+│   ├── ServiceCard.jsx
+│   └── Toast.jsx
+│
 ├── context/
-│   ├── AuthContext.jsx    # Autentikasi state
-│   └── ToastContext.jsx   # Toast notification state
+│   ├── AuthContext.jsx
+│   └── ToastContext.jsx
+│
 ├── pages/
-│   ├── admin/             # Halaman admin
+│   ├── admin/
 │   │   ├── Dashboard.jsx
 │   │   ├── ManageBookings.jsx
 │   │   ├── ManageServices.jsx
 │   │   ├── ManageSchedule.jsx
 │   │   └── Reports.jsx
-│   └── user/              # Halaman user
+│   │
+│   └── user/
 │       ├── Home.jsx
 │       ├── Services.jsx
 │       ├── BookingPage.jsx
 │       ├── BookingForm.jsx
 │       └── MyBookings.jsx
+│
 ├── App.jsx
 ├── main.jsx
-└── styles.css             # Global styles (tema ungu)
+└── styles.css
 ```
 
 ---
@@ -112,7 +165,7 @@ src/
 
 Backend API berada di:
 
-- **Production:** `https://booking-production-xxxx.up.railway.app/api`
+- **Production:** `YOUR_PRODUCTION_API_URL`
 - **Local:** `http://localhost:8000/api`
 
 Dokumentasi API lengkap: [Link Postman](https://documenter.getpostman.com/view/48765304/2sBYArVtFJ)
@@ -124,7 +177,7 @@ Dokumentasi API lengkap: [Link Postman](https://documenter.getpostman.com/view/4
 2. Buka [vercel.com](https://vercel.com) → Import Project.
 3. Pilih repository `futsalnow-fe`.
 4. Tambahkan environment variable:
-   - `VITE_API_URL` = `https://booking-production-xxxx.up.railway.app/api`
+   - VITE_API_URL=YOUR_PRODUCTION_API_URL
 5. Klik **Deploy**.
 
 ---
