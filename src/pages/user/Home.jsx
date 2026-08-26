@@ -710,61 +710,63 @@ export default function Home() {
           height: 240px;
         }
 
-         .features-grid {
+        .features-grid {
           grid-template-columns: repeat(2, 1fr); /* Tablet: jadi 2 kolom */
         }
       }
 
-      @media (max-width: 480px) {
-        .hero-title {
-          font-size: 30px;
-        }
+        @media (max-width: 480px) {
+          .hero-title {
+            font-size: 30px;
+          }
 
-      
-        /* Perbaiki hero agar konten di tengah */
-        .hero-content {
-          text-align: center;
-        }
+          /* Perbaiki hero-content agar terpusat dan memiliki padding simetris */
+          .hero-content {
+            margin: 0 auto;
+            width: 100%;
+            max-width: 100%;
+            padding: 0; /* hilangkan internal padding yang asimetris */
+            text-align: center;
+          }
 
-        /* Search bar wajib 100% dan tanpa batas max-width */
-        .search-bar {
-          width: 100%;
-          max-width: 100%; /* timpa max-width: 520px dari desktop */
-          margin: 0 auto;  /* center */
-          padding: 4px;
-        }
+          /* Search bar full dan simetris */
+          .search-bar {
+            width: 100%;
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 4px 8px; /* tambahkan padding kiri/kanan */
+            display: flex;
+            flex-wrap: nowrap;
+            box-sizing: border-box;
+          }
 
-        /* Biar input dan tombol tetap satu baris */
-        .search-bar {
-          display: flex;
-          flex-wrap: nowrap; /* jangan turun baris */
-        }
+          .search-input {
+            flex: 1;
+            min-width: 0;
+            padding: 10px 8px;
+            font-size: 14px;
+          }
 
-        /* Input memenuhi sisa ruang */
-        .search-input {
-          flex: 1;
-          min-width: 0; /* biar bisa mengecil */
-          padding: 10px 8px;
-          font-size: 14px;
-        }
+          .search-btn {
+            padding: 10px 14px;
+            font-size: 14px;
+            white-space: nowrap;
+            flex-shrink: 0;
+          }
 
-        /* Tombol Cari - ukuran proporsional */
-        .search-btn {
-          padding: 10px 14px;
-          font-size: 14px;
-          white-space: nowrap; /* teks tidak turun baris */
-          flex-shrink: 0;      /* jangan mengecil */
-        }
+          .hero-desc {
+            margin: 12px auto 24px;
+            max-width: 90%; /* agar tidak terlalu melebar */
+          }
 
-        .recommend-grid {
-          grid-template-columns: 1fr;
-        }
+          .recommend-grid {
+            grid-template-columns: 1fr;
+          }
 
-        .features-grid {
-          grid-template-columns: 1fr; /* HP: jadi 1 kolom penuh */
+          .features-grid {
+            grid-template-columns: 1fr;
+          }
         }
-      }
-
       `}</style>
     </div>
   );
