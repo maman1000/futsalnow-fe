@@ -754,6 +754,11 @@ export default function Home() {
             flex-shrink: 0;
           }
 
+          /* Hilangkan margin kiri ikon agar search bar simetris */
+          .search-icon {
+            margin-left: 0;
+          }
+
           .hero-desc {
             margin: 12px auto 24px;
             max-width: 90%; /* agar tidak terlalu melebar */
