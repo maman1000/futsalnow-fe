@@ -720,12 +720,40 @@ export default function Home() {
           font-size: 30px;
         }
 
-        .search-bar {
-          width: 100%;
+      
+        /* Perbaiki hero agar konten di tengah */
+        .hero-content {
+          text-align: center;
         }
 
+        /* Search bar wajib 100% dan tanpa batas max-width */
+        .search-bar {
+          width: 100%;
+          max-width: 100%; /* timpa max-width: 520px dari desktop */
+          margin: 0 auto;  /* center */
+          padding: 4px;
+        }
+
+        /* Biar input dan tombol tetap satu baris */
+        .search-bar {
+          display: flex;
+          flex-wrap: nowrap; /* jangan turun baris */
+        }
+
+        /* Input memenuhi sisa ruang */
+        .search-input {
+          flex: 1;
+          min-width: 0; /* biar bisa mengecil */
+          padding: 10px 8px;
+          font-size: 14px;
+        }
+
+        /* Tombol Cari - ukuran proporsional */
         .search-btn {
-          padding: 11px 16px;
+          padding: 10px 14px;
+          font-size: 14px;
+          white-space: nowrap; /* teks tidak turun baris */
+          flex-shrink: 0;      /* jangan mengecil */
         }
 
         .recommend-grid {
