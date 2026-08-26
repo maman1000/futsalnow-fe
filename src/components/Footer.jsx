@@ -1,5 +1,11 @@
 import { Link } from "react-router-dom";
 
+import {
+  MapPinIcon,
+  EnvelopeIcon,
+  PhoneIcon,
+} from "@heroicons/react/24/outline";
+
 export default function Footer() {
   const year = new Date().getFullYear();
 
@@ -8,167 +14,244 @@ export default function Footer() {
       <div className="footer-container">
         {/* Brand */}
         <div className="footer-brand">
-          <span className="footer-brand-icon">🏟️</span>
-          <span className="footer-brand-name">FutsalNow</span>
+          <Link to="/" className="footer-brand-name">
+            FutsalNow
+          </Link>
+
           <p className="footer-brand-desc">
             Booking lapangan futsal jadi lebih mudah dan cepat.
           </p>
         </div>
 
-        {/* Links */}
+        {/* Navigation */}
         <div className="footer-links">
           <div className="footer-links-group">
             <h4>Menu</h4>
+
             <Link to="/">Beranda</Link>
             <Link to="/services">Layanan</Link>
             <Link to="/my-bookings">Booking Saya</Link>
           </div>
+
           <div className="footer-links-group">
             <h4>Akun</h4>
+
             <Link to="/login">Masuk</Link>
             <Link to="/register">Daftar</Link>
           </div>
+
           <div className="footer-links-group">
             <h4>Kontak</h4>
-            <a href="mailto:info@futsalnow.com">info@futsalnow.com</a>
-            <a href="tel:+62123456789">+62 123 456 789</a>
+
+            <div className="footer-contact">
+              <EnvelopeIcon />
+              <span>Hubungi kami</span>
+            </div>
+
+            <div className="footer-contact">
+              <MapPinIcon />
+              <span>Lapangan futsal terdekat</span>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Bottom bar */}
+      {/* Bottom */}
       <div className="footer-bottom">
-        <p>&copy; {year} FutsalNow. All rights reserved.</p>
-        <div className="footer-socials">
-          <a href="#" aria-label="Instagram">
-            📸
-          </a>
-          <a href="#" aria-label="Twitter">
-            🐦
-          </a>
-          <a href="#" aria-label="YouTube">
-            ▶️
-          </a>
+        <p>© {year} FutsalNow. Semua hak dilindungi.</p>
+
+        <div className="footer-bottom-links">
+          <Link to="/">Beranda</Link>
+          <span>•</span>
+          <Link to="/services">Layanan</Link>
         </div>
       </div>
 
-      {/* ===== CSS ===== */}
       <style>{`
         .footer {
-          background: #1a1a2e;
-          color: rgba(255, 255, 255, 0.8);
-          padding: 3rem 1.5rem 1rem;
-          margin-top: 3rem;
-          border-top: 1px solid rgba(255, 255, 255, 0.06);
+          background: var(--dark);
+          color: var(--white);
+          margin-top: 48px;
         }
 
         .footer-container {
           max-width: 1200px;
           margin: 0 auto;
+          padding: 48px 24px 40px;
+
           display: grid;
-          grid-template-columns: 1.5fr 2fr;
-          gap: 2rem;
-          padding-bottom: 2rem;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+          grid-template-columns: 1.2fr 2fr;
+          gap: 64px;
+
+          border-bottom: 1px solid rgba(226, 232, 240, 0.12);
         }
 
-        .footer-brand-icon {
-          font-size: 1.8rem;
-          margin-right: 0.5rem;
-        }
+        /* =========================
+           BRAND
+        ========================= */
+
         .footer-brand-name {
-          font-size: 1.4rem;
+          display: inline-block;
+
+          color: var(--white);
+          font-size: 1.25rem;
           font-weight: 700;
-          color: white;
+          letter-spacing: -0.02em;
+
+          text-decoration: none;
         }
+
+        .footer-brand-name:hover {
+          color: #86efac;
+        }
+
         .footer-brand-desc {
+          max-width: 320px;
+          margin: 10px 0 0;
+
+          color: #94a3b8;
           font-size: 0.9rem;
-          color: rgba(255, 255, 255, 0.6);
-          margin-top: 0.5rem;
-          max-width: 300px;
-          line-height: 1.5;
+          line-height: 1.6;
         }
+
+        /* =========================
+           LINKS
+        ========================= */
 
         .footer-links {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
-          gap: 1.5rem;
+          gap: 32px;
         }
 
         .footer-links-group h4 {
-          color: white;
+          margin: 0 0 14px;
+
+          color: var(--white);
           font-size: 0.9rem;
           font-weight: 600;
-          margin-bottom: 0.75rem;
-          letter-spacing: 0.03em;
         }
 
         .footer-links-group a {
           display: block;
-          color: rgba(255, 255, 255, 0.6);
-          text-decoration: none;
+
+          width: fit-content;
+          margin-bottom: 9px;
+
+          color: #94a3b8;
           font-size: 0.85rem;
-          padding: 0.2rem 0;
-          transition: color 0.2s;
+          text-decoration: none;
+
+          transition: color 0.15s ease;
         }
+
         .footer-links-group a:hover {
-          color: white;
-          text-decoration: underline;
+          color: var(--white);
         }
+
+        /* =========================
+           CONTACT
+        ========================= */
+
+        .footer-contact {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+
+          margin-bottom: 10px;
+
+          color: #94a3b8;
+          font-size: 0.85rem;
+        }
+
+        .footer-contact svg {
+          width: 17px;
+          height: 17px;
+          flex-shrink: 0;
+
+          color: #94a3b8;
+          stroke-width: 1.8;
+        }
+
+        /* =========================
+           BOTTOM
+        ========================= */
 
         .footer-bottom {
           max-width: 1200px;
           margin: 0 auto;
+
+          padding: 18px 24px;
+
           display: flex;
-          justify-content: space-between;
           align-items: center;
-          padding-top: 1rem;
+          justify-content: space-between;
+          gap: 16px;
+
+          color: #64748b;
           font-size: 0.8rem;
-          color: rgba(255, 255, 255, 0.4);
-          flex-wrap: wrap;
-          gap: 0.5rem;
         }
 
-        .footer-socials {
+        .footer-bottom p {
+          margin: 0;
+        }
+
+        .footer-bottom-links {
           display: flex;
-          gap: 0.75rem;
-        }
-        .footer-socials a {
-          color: rgba(255, 255, 255, 0.4);
-          text-decoration: none;
-          font-size: 1.2rem;
-          transition: color 0.2s;
-        }
-        .footer-socials a:hover {
-          color: white;
+          align-items: center;
+          gap: 8px;
         }
 
-        /* ===== RESPONSIVE ===== */
+        .footer-bottom-links a {
+          color: #64748b;
+          text-decoration: none;
+        }
+
+        .footer-bottom-links a:hover {
+          color: var(--white);
+        }
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
         @media (max-width: 768px) {
           .footer-container {
             grid-template-columns: 1fr;
-            gap: 1.5rem;
+            gap: 32px;
+
+            padding: 40px 20px 32px;
           }
+
           .footer-links {
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
           }
+
           .footer-bottom {
+            padding: 16px 20px;
+
             flex-direction: column;
             text-align: center;
-            gap: 0.5rem;
-          }
-          .footer-brand-desc {
-            max-width: 100%;
           }
         }
 
         @media (max-width: 480px) {
-          .footer-links {
-            grid-template-columns: 1fr;
+          .footer-container {
+            padding: 32px 16px 28px;
           }
-          .footer {
-            padding: 2rem 1rem 0.5rem;
+
+          .footer-links {
+            grid-template-columns: 1fr 1fr;
+            gap: 28px 20px;
+          }
+
+          .footer-links-group:last-child {
+            grid-column: 1 / -1;
+          }
+
+          .footer-bottom {
+            padding: 16px;
           }
         }
       `}</style>

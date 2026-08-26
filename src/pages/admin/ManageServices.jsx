@@ -158,7 +158,7 @@ export default function ManageServices() {
       {/* ===== TOMBOL TAMBAH ===== */}
       <div className="action-bar">
         <button className="btn-add" onClick={() => openModal()}>
-          Tambah Lapangan
+          + Tambah Lapangan
         </button>
       </div>
 
@@ -324,11 +324,11 @@ export default function ManageServices() {
         .page-title {
           font-size: 2rem;
           font-weight: 700;
-          color: #1f2937;
+          color: #0F172A;
           margin-bottom: 0.25rem;
         }
         .page-subtitle {
-          color: #6b7280;
+          color: #64748B;
           font-size: 1rem;
         }
 
@@ -356,15 +356,19 @@ export default function ManageServices() {
           justify-content: flex-end;
         }
         .btn-add {
-          padding: 0.6rem 1.5rem;
-          background: #1e293b;
-          color: white;
+          padding: 0.6rem 1.25rem;
+          background: #16A34A;
+          color: #FFFFFF;
           border: none;
-          border-radius: 30px;
+          border-radius: 8px;
           font-weight: 600;
           font-size: 0.9rem;
           cursor: pointer;
-          transition: 0.2s;
+          transition: background 0.2s ease;
+        }
+
+        .btn-add:hover {
+          background: #15803D;
         }
         .btn-add:hover {
           background: #0f172a;
@@ -375,10 +379,10 @@ export default function ManageServices() {
         /* ===== TABEL PROKA ===== */
         .table-wrapper {
           overflow-x: auto;
-          background: white;
-          border-radius: 16px;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.04);
-          border: 1px solid #f0f0f0;
+          background: #FFFFFF;
+          border-radius: 12px;
+          border: 1px solid #E2E8F0;
+          box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
         }
         .table-proka {
           width: 100%;
@@ -386,8 +390,8 @@ export default function ManageServices() {
           font-size: 0.9rem;
         }
         .table-proka thead {
-          background: #1a1a2e;
-          color: #fff;
+          background: #0F172A;
+          color: #FFFFFF;
         }
         .table-proka th {
           padding: 12px 16px;
@@ -413,65 +417,68 @@ export default function ManageServices() {
         }
 
         .btn-edit-sm {
-          padding: 4px 12px;
-          border: none;
-          border-radius: 30px;
+          padding: 6px 12px;
+          border: 1px solid #E2E8F0;
+          border-radius: 8px;
           font-size: 0.75rem;
-          font-weight: 500;
-          background: #dbeafe;
-          color: #1e40af;
+          font-weight: 600;
+          background: #FFFFFF;
+          color: #0F172A;
           cursor: pointer;
-          transition: 0.2s;
+          transition: 0.2s ease;
         }
+
         .btn-edit-sm:hover {
-          background: #bfdbfe;
+          background: #F8FAFC;
+          border-color: #CBD5E1;
         }
 
         .btn-toggle-sm {
-          padding: 4px 12px;
+          padding: 6px 12px;
           border: none;
-          border-radius: 30px;
+          border-radius: 8px;
           font-size: 0.75rem;
-          font-weight: 500;
-          background: #fef3c7;
-          color: #92400e;
+          font-weight: 600;
+          background: #FEF3C7;
+          color: #92400E;
           cursor: pointer;
-          transition: 0.2s;
         }
+
         .btn-toggle-sm:hover {
-          background: #fde68a;
+          background: #FDE68A;
         }
 
         .btn-delete-sm {
-          padding: 4px 12px;
+          padding: 6px 12px;
           border: none;
-          border-radius: 30px;
+          border-radius: 8px;
           font-size: 0.75rem;
-          font-weight: 500;
-          background: #fee2e2;
-          color: #991b1b;
+          font-weight: 600;
+          background: #FEE2E2;
+          color: #991B1B;
           cursor: pointer;
-          transition: 0.2s;
         }
+
         .btn-delete-sm:hover {
-          background: #fecaca;
+          background: #FECACA;
         }
 
         .status-badge {
-          display: inline-block;
-          padding: 4px 12px;
-          border-radius: 30px;
+          display: inline-flex;
+          align-items: center;
+          padding: 4px 10px;
+          border-radius: 8px;
           font-size: 0.75rem;
           font-weight: 600;
-          text-transform: capitalize;
         }
         .status-available {
-          background: #d4edda;
-          color: #155724;
+          background: #DCFCE7;
+          color: #166534;
         }
+
         .status-maintenance {
-          background: #f8d7da;
-          color: #721c24;
+          background: #FEF3C7;
+          color: #92400E;
         }
 
         /* ===== LOADING & EMPTY ===== */
@@ -510,13 +517,13 @@ export default function ManageServices() {
           padding: 1rem;
         }
         .modal-content {
-          background: white;
-          border-radius: 16px;
+          background: #FFFFFF;
+          border-radius: 12px;
           max-width: 500px;
           width: 100%;
-          box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+          border: 1px solid #E2E8F0;
+          box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);
           overflow: hidden;
-          animation: modalIn 0.25s ease;
         }
         @keyframes modalIn {
           from { opacity: 0; transform: scale(0.95) translateY(20px); }
@@ -528,7 +535,8 @@ export default function ManageServices() {
           align-items: center;
           padding: 1.2rem 1.5rem;
           border-bottom: 1px solid #f0f0f0;
-          background: #fafafa;
+          background: #FFFFFF;
+          border-bottom: 1px solid #E2E8F0;
         }
         .modal-header h3 {
           font-size: 1.1rem;
@@ -598,32 +606,30 @@ export default function ManageServices() {
           justify-content: flex-end;
         }
         .btn-modal-cancel {
-          padding: 0.5rem 1.5rem;
-          background: #f3f4f6;
-          border: none;
-          border-radius: 30px;
+          padding: 0.55rem 1.25rem;
+          background: #FFFFFF;
+          border: 1px solid #E2E8F0;
+          border-radius: 8px;
           font-weight: 500;
-          color: #4b5563;
+          color: #64748B;
           cursor: pointer;
-          transition: 0.2s;
         }
         .btn-modal-cancel:hover {
           background: #e5e7eb;
         }
         .btn-modal-save {
-          padding: 0.5rem 1.5rem;
-          background: #1e293b;
+          padding: 0.55rem 1.25rem;
+          background: #16A34A;
           border: none;
-          border-radius: 30px;
+          border-radius: 8px;
           font-weight: 600;
-          color: white;
+          color: #FFFFFF;
           cursor: pointer;
-          transition: 0.2s;
+          transition: background 0.2s ease;
         }
+
         .btn-modal-save:hover {
-          background: #0f172a;
-          transform: scale(1.02);
-          box-shadow: 0 4px 12px rgba(30,41,59,0.25);
+          background: #15803D;
         }
 
         /* ===== RESPONSIVE ===== */

@@ -16,15 +16,6 @@ const formatRupiah = (n) =>
     minimumFractionDigits: 0,
   }).format(n ?? 0);
 
-const getPromoBadge = (index) => {
-  const badges = [
-    { label: "Populer", className: "badge-popular" },
-    { label: "Promo 10%", className: "badge-promo" },
-    { label: "Premium", className: "badge-premium" },
-  ];
-  return badges[index % badges.length];
-};
-
 const fieldImages = [
   "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=400&h=300&fit=crop",
   "https://images.unsplash.com/photo-1560272564-c83b66b1ad12?w=400&h=300&fit=crop",
@@ -59,21 +50,21 @@ export default function Home() {
       return true;
     })
     .filter((s) => s.name.toLowerCase().includes(searchTerm.toLowerCase()))
-    .slice(0, 4);
+    .slice(0, 3);
 
   const features = [
     {
-      icon: <BoltIcon className="w-5 h-5" />,
+      icon: <BoltIcon />,
       title: "Booking Instan",
       desc: "Lihat jadwal real-time dan pesan langsung.",
     },
     {
-      icon: <ShieldCheckIcon className="w-5 h-5" />,
+      icon: <ShieldCheckIcon />,
       title: "Aman Terjaga",
       desc: "Pembayaran aman, riwayat tersimpan rapi.",
     },
     {
-      icon: <BuildingLibraryIcon className="w-5 h-5" />,
+      icon: <BuildingLibraryIcon />,
       title: "Banyak Pilihan",
       desc: "Temukan lapangan dengan harga terbaik.",
     },
@@ -82,7 +73,7 @@ export default function Home() {
   return (
     <div className="home-page page-content">
       {/* ===== HERO ===== */}
-      <section className="hero-section">
+      {/* <section className="hero-section">
         <div className="hero-blur-1"></div>
         <div className="hero-blur-2"></div>
 
@@ -206,12 +197,61 @@ export default function Home() {
             </svg>
           </div>
         </div>
+      </section> */}
+
+      <section className="hero-section">
+        <div className="hero-content">
+          <p className="hero-eyebrow">FUTSALNOW</p>
+
+          <h1 className="hero-title">
+            Cari lapangan futsal.
+            <br />
+            <span>Booking sekarang.</span>
+          </h1>
+
+          <p className="hero-desc">
+            Pilih lapangan dan jadwal bermainmu dengan mudah.
+          </p>
+
+          <div className="search-bar">
+            <MagnifyingGlassIcon className="search-icon" />
+
+            <input
+              type="text"
+              className="search-input"
+              placeholder="Cari lapangan..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+
+            <Link to="/services" className="search-btn">
+              Cari
+            </Link>
+          </div>
+
+          {!user && (
+            <div className="hero-auth">
+              <span>Belum punya akun?</span>{" "}
+              <Link to="/register" className="hero-register-link">
+                Daftar sekarang
+              </Link>
+            </div>
+          )}
+        </div>
+
+        <div className="hero-image-wrapper">
+          <img
+            src={fieldImages[0]}
+            alt="Lapangan futsal"
+            className="hero-image"
+          />
+        </div>
       </section>
 
-      {/* ===== REKOMENDASI LAPANGAN ===== */}
+      {/* ===== LAPANGAN TERSEDIA ===== */}
       <section className="recommend-section">
         <div className="section-header">
-          <h2 className="section-title">Lapangan Rekomendasi</h2>
+          <h2 className="section-title">Lapangan Tersedia</h2>
           <Link to="/services" className="view-all-link">
             Lihat semua →
           </Link>
@@ -227,7 +267,6 @@ export default function Home() {
         ) : (
           <div className="recommend-grid">
             {filteredServices.map((service, index) => {
-              const promo = getPromoBadge(index);
               const imgIndex = index % fieldImages.length;
               return (
                 <div key={service.id} className="rec-card">
@@ -238,21 +277,19 @@ export default function Home() {
                       className="rec-image"
                       loading="lazy"
                     />
-                    <span className={`rec-badge ${promo.className}`}>
-                      {promo.label}
-                    </span>
                   </div>
+
                   <div className="rec-body">
                     <h3 className="rec-name">{service.name}</h3>
-                    <div className="rec-meta">
-                      <span className="rec-price">
-                        {formatRupiah(service.price_per_hour)}
-                        <span className="rec-price-unit">/ jam</span>
-                      </span>
-                      <Link to={`/booking/${service.id}`} className="rec-btn">
-                        Booking →
-                      </Link>
-                    </div>
+
+                    <p className="rec-price">
+                      {formatRupiah(service.price_per_hour)}
+                      <span>/ jam</span>
+                    </p>
+
+                    <Link to={`/booking/${service.id}`} className="rec-btn">
+                      Booking Sekarang
+                    </Link>
                   </div>
                 </div>
               );
@@ -301,424 +338,367 @@ export default function Home() {
         }
 
         .hero-section {
-          display: flex;
+          display: grid;
+          grid-template-columns: 1.1fr 0.9fr;
           align-items: center;
-          justify-content: space-between;
-          padding: 2.5rem 0;
-          gap: 2rem;
-          flex-wrap: wrap;
-          background: white;
-          border-radius: 0 0 30px 30px;
-          min-height: 300px;
-          position: relative;
-          overflow: hidden;
-        }
+          gap: 48px;
 
-        .hero-blur-1 {
-          position: absolute;
-          top: -50px;
-          right: -30px;
-          width: 200px;
-          height: 200px;
-          background: radial-gradient(circle, rgba(30,41,59,0.04) 0%, transparent 70%);
-          border-radius: 50%;
-          filter: blur(60px);
-          z-index: 0;
-          pointer-events: none;
-        }
-        .hero-blur-2 {
-          position: absolute;
-          bottom: -60px;
-          left: -40px;
-          width: 250px;
-          height: 250px;
-          background: radial-gradient(circle, rgba(30,41,59,0.03) 0%, transparent 70%);
-          border-radius: 60% 40% 50% 50%;
-          filter: blur(70px);
-          z-index: 0;
-          pointer-events: none;
+          padding: 48px 0 32px;
         }
 
         .hero-content {
-          flex: 1 1 400px;
-          z-index: 1;
+          max-width: 580px;
         }
-        .hero-title {
-          font-size: 2.2rem;
+
+        .hero-eyebrow {
+          margin: 0 0 12px;
+
+          color: #16a34a;
+          font-size: 14px;
           font-weight: 700;
-          color: #1f2937;
-          line-height: 1.2;
-          margin-bottom: 0.5rem;
+          letter-spacing: 0.08em;
         }
-        .hero-highlight {
-          color: #1e293b;
+
+        .hero-title {
+          margin: 0;
+
+          color: #0f172a;
+          font-size: 44px;
+          font-weight: 700;
+          line-height: 1.1;
+          letter-spacing: -0.03em;
         }
+
+        .hero-title span {
+          color: #16a34a;
+        }
+
         .hero-desc {
-          color: #6b7280;
-          font-size: 1rem;
-          margin-bottom: 1.2rem;
+          margin: 24px 0 32px;
+          color: #64748b;
+          font-size: 17px;
+          line-height: 1.6;
         }
 
         .search-bar {
           display: flex;
           align-items: center;
-          background: #f5f7fa;
-          border-radius: 30px;
-          padding: 0.3rem 0.3rem 0.3rem 1rem;
-          border: 1px solid #e5e7eb;
-          max-width: 480px;
-          transition: 0.2s;
-        }
-        .search-bar:focus-within {
-          border-color: #1e293b;
-          box-shadow: 0 0 0 4px rgba(30,41,59,0.08);
-        }
-        .search-icon {
-          width: 1.2rem;
-          height: 1.2rem;
-          color: #6b7280;
-          flex-shrink: 0;
-        }
-        .search-input {
-          flex: 1;
-          border: none;
-          background: transparent;
-          padding: 0.6rem 0.8rem;
-          font-size: 0.95rem;
-          outline: none;
-        }
-        .search-btn {
-          padding: 0.5rem 1.2rem;
-          background: #1e293b;
-          color: white;
-          border-radius: 30px;
-          font-weight: 600;
-          font-size: 0.85rem;
-          text-decoration: none;
-          transition: 0.2s;
-        }
-        .search-btn:hover {
-          background: #0f172a;
-          transform: scale(1.02);
+
+          max-width: 520px;
+          padding: 4px;
+
+          background: #ffffff;
+          border: 1px solid #e2e8f0;
+          border-radius: 8px;
+
+          box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
         }
 
-        .quick-filter {
-          display: flex;
-          gap: 0.5rem;
-          margin-top: 0.8rem;
-          flex-wrap: wrap;
+        .search-bar:focus-within {
+          border-color: #16a34a;
         }
-        .filter-chip {
-          padding: 0.2rem 0.8rem;
-          border: 1px solid #e5e7eb;
-          border-radius: 30px;
-          background: white;
-          font-size: 0.8rem;
-          color: #4b5563;
-          cursor: pointer;
-          transition: 0.2s;
+
+        .search-icon {
+          width: 20px;
+          height: 20px;
+          margin-left: 12px;
+
+          color: #64748b;
         }
-        .filter-chip:hover {
-          border-color: #1e293b;
+
+        .search-input {
+          flex: 1;
+
+          border: none;
+          outline: none;
+          background: transparent;
+
+          padding: 12px;
+
+          color: #0f172a;
+          font-size: 15px;
         }
-        .filter-chip.active {
-          background: #1e293b;
-          color: white;
-          border-color: #1e293b;
+
+        .search-btn {
+          padding: 11px 20px;
+
+          background: #16a34a;
+          color: #ffffff;
+
+          border-radius: 6px;
+
+          font-size: 14px;
+          font-weight: 600;
+          text-decoration: none;
+        }
+
+        .search-btn:hover {
+          background: #15803d;
         }
 
         .hero-auth {
-          margin-top: 1rem;
-          font-size: 0.9rem;
-          color: #6b7280;
+          margin-top: 16px;
+
+          color: #64748b;
+          font-size: 14px;
         }
+
         .hero-register-link {
-          color: #1e293b;
+          color: #16a34a;
           font-weight: 600;
           text-decoration: none;
         }
+
         .hero-register-link:hover {
           text-decoration: underline;
         }
 
         .hero-image-wrapper {
-          flex: 1 1 200px;
           display: flex;
-          justify-content: center;
-        }
-        .hero-image {
-          background: #f5f7fa;
-          border-radius: 50%;
-          padding: 1rem;
-        }
-        .hero-illustration {
-          max-width: 100%;
-          height: auto;
+          justify-content: flex-end;
         }
 
-        .recommend-section {
-          padding: 2rem 0 1.5rem;
+        .hero-image {
+          width: 100%;
+          max-width: 460px;
+          height: 300px;
+
+          object-fit: cover;
+
+          border-radius: 12px;
         }
-        .section-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 1rem;
+
+        .rec-card {
+          overflow: hidden;
+
+          background: #ffffff;
+
+          border: 1px solid #e2e8f0;
+          border-radius: 12px;
+
+          transition: transform 0.2s ease,
+                      box-shadow 0.2s ease;
         }
-        .section-title {
-          font-size: 1.4rem;
+
+        .rec-card:hover {
+          transform: translateY(-3px);
+
+          box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+        }
+
+        .rec-image-wrapper {
+          height: 180px;
+
+          overflow: hidden;
+          background: #f1f5f9;
+        }
+
+        .rec-image {
+          width: 100%;
+          height: 100%;
+
+          object-fit: cover;
+
+          transition: transform 0.3s ease;
+        }
+
+        .rec-card:hover .rec-image {
+          transform: scale(1.03);
+        }
+
+        .rec-body {
+          padding: 16px;
+        }
+
+        .rec-name {
+          margin: 0 0 8px;
+
+          color: #0f172a;
+
+          font-size: 18px;
+          font-weight: 600;
+        }
+
+        .rec-price {
+          margin: 0 0 16px;
+
+          color: #16a34a;
+
+          font-size: 16px;
           font-weight: 700;
-          color: #1f2937;
-          margin: 0;
         }
-        .view-all-link {
-          color: #1e293b;
-          font-weight: 500;
-          font-size: 0.9rem;
+
+        .rec-price span {
+          margin-left: 3px;
+
+          color: #64748b;
+
+          font-size: 14px;
+          font-weight: 400;
+        }
+
+        .rec-btn {
+          display: block;
+
+          width: 100%;
+          padding: 10px 16px;
+
+          background: #16a34a;
+          color: #ffffff;
+
+          border-radius: 7px;
+
+          text-align: center;
+
+          font-size: 14px;
+          font-weight: 600;
           text-decoration: none;
+
+          transition: background 0.2s ease;
         }
-        .view-all-link:hover {
-          text-decoration: underline;
+
+        .rec-btn:hover {
+          background: #15803d;
         }
 
         .recommend-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-          gap: 1.5rem;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 24px;
         }
 
-        .rec-card {
-          background: white;
-          border-radius: 16px;
-          overflow: hidden;
-          border: 1px solid #f3f0ff;
-          transition: 0.25s;
-        }
-        .rec-card:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 8px 30px rgba(0,0,0,0.06);
-        }
-        .rec-image-wrapper {
-          position: relative;
-          overflow: hidden;
-          background: #f5f7fa;
-          height: 140px;
-        }
-        .rec-image {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          transition: 0.3s;
-        }
-        .rec-card:hover .rec-image {
-          transform: scale(1.04);
-        }
-        .rec-badge {
-          position: absolute;
-          top: 8px;
-          left: 8px;
-          padding: 0.15rem 0.6rem;
-          border-radius: 30px;
-          font-size: 0.6rem;
-          font-weight: 600;
-          color: white;
-          text-transform: uppercase;
-          letter-spacing: 0.03em;
-        }
-        .badge-popular { background: #c97b5c; }
-        .badge-promo { background: #2563eb; }
-        .badge-premium { background: #0d9488; }
+        .section-title {
+          margin: 0;
 
-        .rec-body {
-          padding: 0.8rem 1rem 1rem;
-        }
-        .rec-name {
-          font-size: 0.95rem;
-          font-weight: 600;
-          color: #1f2937;
-          margin: 0 0 0.3rem;
-        }
-        .rec-meta {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-        }
-        .rec-price {
+          color: #0f172a;
+          font-family: Inter, sans-serif;
+          font-size: 28px;
           font-weight: 700;
-          color: #1e293b;
-          font-size: 1rem;
-        }
-        .rec-price-unit {
-          font-weight: 400;
-          font-size: 0.7rem;
-          color: #6b7280;
-          margin-left: 0.1rem;
-        }
-        .rec-btn {
-          padding: 0.25rem 0.9rem;
-          background: #1e293b;
-          color: white;
-          border-radius: 30px;
-          font-weight: 600;
-          font-size: 0.75rem;
-          text-decoration: none;
-          transition: 0.2s;
-        }
-        .rec-btn:hover {
-          background: #0f172a;
+          line-height: 1.2;
         }
 
-        .loading-spinner {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          padding: 2rem 0;
-          color: #6b7280;
+        .view-all-link {
+          color: #16a34a;
+          font-size: 14px;
+          font-weight: 600;
+          text-decoration: none;
         }
-        .spinner {
-          width: 30px;
-          height: 30px;
-          border: 3px solid #f3f0ff;
-          border-top: 3px solid #1e293b;
-          border-radius: 50%;
-          animation: spin 0.8s linear infinite;
-          margin-bottom: 0.5rem;
-        }
-        @keyframes spin {
-          to { transform: rotate(360deg); }
-        }
-        .empty-text {
-          color: #6b7280;
-          text-align: center;
-          padding: 1rem 0;
+
+        .recommend-section {
+          padding: 32px 0 48px;
         }
 
         .features-section {
-          padding: 2rem 0 2.5rem;
-          text-align: center;
+          padding: 48px 0 64px;
         }
+
         .features-title {
-          font-size: 1.6rem;
+          margin: 0 0 24px;
+          color: #0f172a;
+          font-family: Inter, sans-serif;
+          font-size: 28px;
           font-weight: 700;
-          color: #1f2937;
-          margin-bottom: 1.5rem;
+          line-height: 1.2;
         }
+
         .text-primary {
-          color: #1e293b;
+          color: #16a34a;
         }
+
         .features-grid {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
-          gap: 1.5rem;
+          gap: 24px;
         }
+
         .feature-card {
-          background: white;
-          padding: 1.5rem 1rem;
-          border-radius: 16px;
-          border: 1px solid #f3f0ff;
-          text-align: center;
+          padding: 24px;
+          background: #ffffff;
+          border: 1px solid #e2e8f0;
+          border-radius: 12px;
         }
+
         .feature-icon {
           width: 40px;
           height: 40px;
-          background: #f1f5f9;
-          border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
-          margin: 0 auto 0.5rem;
-          color: #1e293b;
-        }
-        .feature-name {
-          font-weight: 600;
-          color: #1f2937;
-          font-size: 1rem;
-          margin-bottom: 0.2rem;
-        }
-        .feature-desc {
-          color: #6b7280;
-          font-size: 0.85rem;
-          line-height: 1.4;
+          margin-bottom: 16px;
+          color: #16a34a;
+          background: #f0fdf4;
+          border-radius: 8px;
         }
 
-        .cta-section {
-          padding: 0.5rem 0 2rem;
+        .feature-icon svg {
+          width: 20px;
+          height: 20px;
         }
-        .cta-box {
-          background: #f1f5f9;
-          border-radius: 24px;
-          padding: 2rem 2rem;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          flex-wrap: wrap;
-          gap: 1rem;
-        }
-        .cta-content {
-          flex: 1;
-        }
-        .cta-title {
-          font-size: 1.4rem;
-          font-weight: 700;
-          color: #1f2937;
-          margin-bottom: 0.2rem;
-        }
-        .cta-desc {
-          color: #6b7280;
-          margin-bottom: 0.5rem;
-        }
-        .cta-btn {
-          padding: 0.5rem 1.5rem;
-          background: #1e293b;
-          color: white;
-          border-radius: 30px;
+
+        .feature-name {
+          margin: 0 0 8px;
+          color: #0f172a;
+          font-family: Inter, sans-serif;
+          font-size: 16px;
           font-weight: 600;
-          text-decoration: none;
-          display: inline-block;
-          transition: 0.2s;
         }
-        .cta-btn:hover {
-          background: #0f172a;
-          transform: scale(1.02);
+
+        .feature-desc {
+          margin: 0;
+          color: #64748b;
+          font-size: 14px;
+          line-height: 1.6;
+        }
+
+        @media (max-width: 900px) {
+          .recommend-grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
         }
 
         @media (max-width: 768px) {
-          .hero-section {
-            flex-direction: column;
-            text-align: center;
-            padding: 1.5rem 0;
-          }
-          .search-bar {
-            max-width: 100%;
-            margin: 0 auto;
-          }
-          .hero-image-wrapper {
-            display: none;
-          }
-          .features-grid {
-            grid-template-columns: 1fr;
-            max-width: 320px;
-            margin: 0 auto;
-          }
-          .recommend-grid {
-            grid-template-columns: 1fr 1fr;
-          }
-          .cta-box {
-            flex-direction: column;
-            text-align: center;
-          }
-          .hero-blur-1, .hero-blur-2 {
-            display: none;
-          }
+        .hero-section {
+          grid-template-columns: 1fr;
+          gap: 32px;
+          padding: 40px 0;
         }
-        @media (max-width: 480px) {
-          .recommend-grid {
-            grid-template-columns: 1fr;
-          }
-          .hero-title {
-            font-size: 1.6rem;
-          }
+
+        .hero-content {
+          max-width: none;
         }
+
+        .hero-title {
+          font-size: 36px;
+        }
+
+        .hero-image-wrapper {
+          justify-content: center;
+        }
+
+        .hero-image {
+          max-width: 100%;
+          height: 240px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .hero-title {
+          font-size: 30px;
+        }
+
+        .search-bar {
+          width: 100%;
+        }
+
+        .search-btn {
+          padding: 11px 16px;
+        }
+
+        .recommend-grid {
+          grid-template-columns: 1fr;
+  }
+      }
+
       `}</style>
     </div>
   );

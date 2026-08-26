@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
+
 import { getReportBookings } from "../../api/bookingApi";
 
 const formatRupiah = (n) => {
-  let value = Number(n ?? 0);
-  if (value < 10000) value = value * 1000;
+  const value = Number(n ?? 0);
+
   return new Intl.NumberFormat("id-ID", {
     style: "currency",
     currency: "IDR",
@@ -14,7 +15,9 @@ const formatRupiah = (n) => {
 
 const formatTanggal = (d) => {
   if (!d) return "-";
+
   const date = new Date(d);
+
   return isNaN(date.getTime())
     ? "-"
     : date.toLocaleDateString("id-ID", {
@@ -25,6 +28,17 @@ const formatTanggal = (d) => {
 };
 
 const formatJam = (t) => (t || "").slice(0, 5);
+
+const getStatusLabel = (status) => {
+  const labels = {
+    pending: "Menunggu",
+    confirmed: "Dikonfirmasi",
+    completed: "Selesai",
+    canceled: "Dibatalkan",
+  };
+
+  return labels[status] || status || "-";
+};
 
 export default function Reports() {
   const [bookings, setBookings] = useState([]);
@@ -39,21 +53,26 @@ export default function Reports() {
     per_page: 10,
     total: 0,
   });
+
   const [currentPage, setCurrentPage] = useState(1);
 
   const fetchReport = useCallback(async () => {
     setLoading(true);
     setError("");
+
     try {
       const params = {};
+
       if (from) params.from = from;
       if (to) params.to = to;
       if (currentPage) params.page = currentPage;
 
       const res = await getReportBookings(params);
+
       console.log("REPORT RESPONSE:", res.data);
 
       const bookingsData = res.data?.data ?? res.data;
+
       setBookings(Array.isArray(bookingsData) ? bookingsData : []);
 
       if (res.data?.current_page) {
@@ -84,6 +103,7 @@ export default function Reports() {
 
   const goToPage = (page) => {
     if (page < 1 || page > pagination.last_page) return;
+
     setCurrentPage(page);
   };
 
@@ -91,29 +111,22 @@ export default function Reports() {
     .filter((b) => b.payment_status === "paid")
     .reduce((sum, b) => sum + Number(b.total_price || 0), 0);
 
-  const stats = [
-    {
-      label: "Total Booking",
-      value: pagination.total,
-      icon: "📊",
-      bg: "bg-blue",
-      text: "text-blue-700",
-    },
-    {
-      label: "Total Pendapatan (halaman ini)",
-      value: formatRupiah(totalPendapatan),
-      icon: "💰",
-      bg: "bg-green",
-      text: "text-green-700",
-    },
-  ];
-
   return (
-    <div className="reports-proka">
-      {/* ===== FILTER ===== */}
-      <div className="filter-bar-proka">
+    <div className="reports-page">
+      {/* HEADER */}
+      <div className="page-header">
+        <h1 className="page-title">Laporan Booking</h1>
+
+        <p className="page-subtitle">
+          Pantau data booking dan pembayaran berdasarkan periode.
+        </p>
+      </div>
+
+      {/* FILTER */}
+      <div className="filter-card">
         <div className="filter-group">
           <label className="filter-label">Dari</label>
+
           <input
             type="date"
             className="filter-input"
@@ -124,8 +137,10 @@ export default function Reports() {
             }}
           />
         </div>
+
         <div className="filter-group">
           <label className="filter-label">Sampai</label>
+
           <input
             type="date"
             className="filter-input"
@@ -136,9 +151,11 @@ export default function Reports() {
             }}
           />
         </div>
+
         {(from || to) && (
           <button
-            className="btn-reset-proka"
+            type="button"
+            className="btn-reset"
             onClick={() => {
               setFrom("");
               setTo("");
@@ -150,22 +167,37 @@ export default function Reports() {
         )}
       </div>
 
-      {/* ===== STATS ===== */}
-      <div className="stats-grid-proka">
-        {stats.map((stat, index) => (
-          <div key={index} className={`stat-card-proka ${stat.bg}`}>
-            <div className="stat-icon">{stat.icon}</div>
-            <div className="stat-content">
-              <span className="stat-label">{stat.label}</span>
-              <span className={`stat-value ${stat.text}`}>{stat.value}</span>
+      {/* SUMMARY */}
+      {!loading && !error && (
+        <div className="summary-grid">
+          <div className="summary-card">
+            <div className="summary-label">Total Booking</div>
+
+            <div className="summary-value">{pagination.total}</div>
+
+            <div className="summary-description">
+              Booking pada periode yang dipilih
             </div>
           </div>
-        ))}
-      </div>
 
-      {/* ===== TABLE ===== */}
+          <div className="summary-card">
+            <div className="summary-label">Pendapatan di Halaman Ini</div>
+
+            <div className="summary-value summary-income">
+              {formatRupiah(totalPendapatan)}
+            </div>
+
+            <div className="summary-description">
+              Hanya dari booking yang sudah lunas
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ERROR */}
       {error && <div className="alert alert-error">{error}</div>}
 
+      {/* TABLE */}
       {loading ? (
         <div className="loading-state">
           <div className="spinner"></div>
@@ -173,71 +205,103 @@ export default function Reports() {
         </div>
       ) : bookings.length === 0 ? (
         <div className="empty-state">
-          <p>😕 Belum ada data di rentang tanggal ini.</p>
+          <p>Belum ada data booking pada periode ini.</p>
         </div>
       ) : (
         <>
-          <div className="table-wrapper">
-            <table className="table-proka">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Pelanggan</th>
-                  <th>Layanan</th>
-                  <th>Tanggal</th>
-                  <th>Jam</th>
-                  <th>Status</th>
-                  <th>Total</th>
-                  <th>Pembayaran</th>
-                </tr>
-              </thead>
-              <tbody>
-                {bookings.map((b, index) => (
-                  <tr key={b.id}>
-                    <td>
-                      {(pagination.current_page - 1) * pagination.per_page +
-                        index +
-                        1}
-                    </td>
-                    <td>{b.user?.name || "-"}</td>
-                    <td>{b.service?.name || "-"}</td>
-                    <td>{formatTanggal(b.booking_date)}</td>
-                    <td>
-                      {formatJam(b.start_time)}–{formatJam(b.end_time)}
-                    </td>
-                    <td>
-                      <span className={`status-badge status-${b.status}`}>
-                        {b.status}
-                      </span>
-                    </td>
-                    <td>{formatRupiah(b.total_price)}</td>
-                    <td>
-                      {b.payment_status === "paid" ? (
-                        <span className="badge-success">Lunas</span>
-                      ) : (
-                        <span className="badge-warning">Belum Dibayar</span>
-                      )}
-                    </td>
+          <div className="table-card">
+            <div className="table-header">
+              <div>
+                <h2>Data Booking</h2>
+
+                <p>
+                  Menampilkan {bookings.length} dari {pagination.total} booking.
+                </p>
+              </div>
+            </div>
+
+            <div className="table-wrapper">
+              <table className="report-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Pelanggan</th>
+                    <th>Lapangan</th>
+                    <th>Tanggal</th>
+                    <th>Jam</th>
+                    <th>Status</th>
+                    <th>Total</th>
+                    <th>Pembayaran</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+
+                <tbody>
+                  {bookings.map((b, index) => (
+                    <tr key={b.id}>
+                      <td>
+                        {(pagination.current_page - 1) * pagination.per_page +
+                          index +
+                          1}
+                      </td>
+
+                      <td className="customer-name">{b.user?.name || "-"}</td>
+
+                      <td>{b.service?.name || "-"}</td>
+
+                      <td>{formatTanggal(b.booking_date)}</td>
+
+                      <td className="time-cell">
+                        {formatJam(b.start_time)}–{formatJam(b.end_time)}
+                      </td>
+
+                      <td>
+                        <span className={`status-text status-${b.status}`}>
+                          {getStatusLabel(b.status)}
+                        </span>
+                      </td>
+
+                      <td className="price-cell">
+                        {formatRupiah(b.total_price)}
+                      </td>
+
+                      <td>
+                        <span
+                          className={
+                            b.payment_status === "paid"
+                              ? "payment-paid"
+                              : "payment-unpaid"
+                          }
+                        >
+                          {b.payment_status === "paid"
+                            ? "Lunas"
+                            : "Belum Dibayar"}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
 
-          {/* ===== PAGINATION ===== */}
+          {/* PAGINATION */}
           {pagination.last_page > 1 && (
             <div className="pagination">
               <button
+                type="button"
                 className="page-btn"
                 onClick={() => goToPage(pagination.current_page - 1)}
                 disabled={pagination.current_page === 1}
               >
                 ← Sebelumnya
               </button>
+
               <span className="page-info">
-                {pagination.current_page} / {pagination.last_page}
+                Halaman {pagination.current_page} dari {pagination.last_page}
               </span>
+
               <button
+                type="button"
                 className="page-btn"
                 onClick={() => goToPage(pagination.current_page + 1)}
                 disabled={pagination.current_page === pagination.last_page}
@@ -249,292 +313,456 @@ export default function Reports() {
         </>
       )}
 
-      {/* ===== CSS ===== */}
       <style>{`
-        .reports-proka {
+        /* =========================================
+           FUTSALNOW DESIGN SYSTEM
+           ========================================= */
+
+        .reports-page {
           max-width: 1200px;
           margin: 0 auto;
+          padding: 2rem 1.5rem;
+          background: #F8FAFC;
         }
 
-        /* ===== FILTER ===== */
-        .filter-bar-proka {
-          display: flex;
-          flex-wrap: wrap;
-          align-items: center;
-          gap: 1rem 1.5rem;
-          background: white;
-          padding: 1rem 1.5rem;
-          border-radius: 14px;
-          margin-bottom: 1.5rem;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.04);
-          border: 1px solid #f0f0f0;
+        /* ================= HEADER ================= */
+
+        .page-header {
+          margin-bottom: 1.75rem;
         }
+
+        .page-title {
+          margin: 0 0 0.4rem;
+          color: #0F172A;
+          font-size: 1.9rem;
+          font-weight: 700;
+          line-height: 1.2;
+        }
+
+        .page-subtitle {
+          margin: 0;
+          color: #64748B;
+          font-size: 0.95rem;
+        }
+
+        /* ================= FILTER ================= */
+
+        .filter-card {
+          display: flex;
+          align-items: flex-end;
+          flex-wrap: wrap;
+          gap: 1rem;
+
+          padding: 1rem 1.25rem;
+
+          background: #FFFFFF;
+          border: 1px solid #E2E8F0;
+          border-radius: 12px;
+
+          margin-bottom: 1.25rem;
+
+          box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+        }
+
         .filter-group {
           display: flex;
-          align-items: center;
-          gap: 0.5rem;
+          flex-direction: column;
+          gap: 0.4rem;
         }
+
         .filter-label {
-          font-weight: 500;
-          color: #374151;
-          font-size: 0.85rem;
+          color: #0F172A;
+          font-size: 0.8rem;
+          font-weight: 600;
         }
+
         .filter-input {
-          padding: 0.4rem 0.8rem;
-          border: 1.5px solid #e5e7eb;
+          min-width: 170px;
+          height: 38px;
+
+          padding: 0 0.75rem;
+
+          border: 1px solid #E2E8F0;
           border-radius: 8px;
-          font-size: 0.9rem;
-          background: #fafafa;
-          transition: 0.2s;
+
+          background: #FFFFFF;
+          color: #0F172A;
+
+          font-size: 0.875rem;
+          font-family: inherit;
+
+          transition:
+            border-color 0.15s ease,
+            box-shadow 0.15s ease;
         }
+
         .filter-input:focus {
           outline: none;
-          border-color: #1e293b;
-          background: white;
-          box-shadow: 0 0 0 3px rgba(30,41,59,0.08);
-        }
-        .btn-reset-proka {
-          padding: 0.3rem 1rem;
-          background: #f3f4f6;
-          border: none;
-          border-radius: 30px;
-          font-size: 0.8rem;
-          font-weight: 500;
-          color: #4b5563;
-          cursor: pointer;
-          transition: 0.2s;
-        }
-        .btn-reset-proka:hover {
-          background: #e5e7eb;
+          border-color: #16A34A;
+          box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
         }
 
-        /* ===== STATS ===== */
-        .stats-grid-proka {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-          gap: 1rem;
-          margin-bottom: 1.5rem;
-        }
-        .stat-card-proka {
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-          padding: 1rem 1.25rem;
-          border-radius: 14px;
-          background: white;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.04);
-          transition: all 0.25s ease;
-          border: 1px solid #f0f0f0;
-          min-width: 0;
-          overflow: hidden;
-        }
-        .stat-card-proka:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 12px 30px rgba(0,0,0,0.08);
-        }
-        .stat-icon {
-          font-size: 1.6rem;
-          line-height: 1;
-          width: 40px;
-          text-align: center;
-          flex-shrink: 0;
-        }
-        .stat-content {
-          flex: 1;
-          min-width: 0;
-        }
-        .stat-label {
-          display: block;
-          font-size: 0.7rem;
+        .btn-reset {
+          height: 38px;
+
+          padding: 0 1rem;
+
+          border: 1px solid #E2E8F0;
+          border-radius: 8px;
+
+          background: #FFFFFF;
+          color: #64748B;
+
+          font-size: 0.85rem;
           font-weight: 600;
-          color: #6b7280;
-          text-transform: uppercase;
-          letter-spacing: 0.03em;
-        }
-        .stat-value {
-          display: block;
-          font-size: 1.3rem;
-          font-weight: 700;
-          color: #1f2937;
-          line-height: 1.2;
-          margin-top: 0.1rem;
-          word-break: break-word;
-          overflow-wrap: break-word;
-        }
-        .bg-blue { background: #dbeafe; }
-        .bg-green { background: #d1fae5; }
-        .text-blue-700 { color: #1d4ed8; }
-        .text-green-700 { color: #16a34a; }
 
-        /* ===== TABLE PROKA ===== */
+          cursor: pointer;
+          transition: 0.15s ease;
+        }
+
+        .btn-reset:hover {
+          border-color: #CBD5E1;
+          color: #0F172A;
+          background: #F8FAFC;
+        }
+
+        /* ================= SUMMARY ================= */
+
+        .summary-grid {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 1rem;
+
+          margin-bottom: 1.25rem;
+        }
+
+        .summary-card {
+          padding: 1.25rem;
+
+          background: #FFFFFF;
+          border: 1px solid #E2E8F0;
+          border-radius: 12px;
+
+          box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+        }
+
+        .summary-label {
+          color: #64748B;
+          font-size: 0.8rem;
+          font-weight: 600;
+          margin-bottom: 0.4rem;
+        }
+
+        .summary-value {
+          color: #0F172A;
+          font-size: 1.5rem;
+          font-weight: 700;
+          line-height: 1.3;
+        }
+
+        .summary-income {
+          color: #16A34A;
+        }
+
+        .summary-description {
+          margin-top: 0.3rem;
+          color: #64748B;
+          font-size: 0.75rem;
+        }
+
+        /* ================= TABLE CARD ================= */
+
+        .table-card {
+          background: #FFFFFF;
+          border: 1px solid #E2E8F0;
+          border-radius: 12px;
+
+          overflow: hidden;
+
+          box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+        }
+
+        .table-header {
+          padding: 1.1rem 1.25rem;
+
+          border-bottom: 1px solid #E2E8F0;
+        }
+
+        .table-header h2 {
+          margin: 0 0 0.25rem;
+
+          color: #0F172A;
+          font-size: 1rem;
+          font-weight: 700;
+        }
+
+        .table-header p {
+          margin: 0;
+
+          color: #64748B;
+          font-size: 0.8rem;
+        }
+
         .table-wrapper {
           overflow-x: auto;
-          background: white;
-          border-radius: 16px;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.04);
-          border: 1px solid #f0f0f0;
         }
-        .table-proka {
+
+        .report-table {
           width: 100%;
+          min-width: 900px;
+
           border-collapse: collapse;
-          font-size: 0.9rem;
+
+          font-size: 0.85rem;
         }
-        .table-proka thead {
-          background: #1a1a2e;
-          color: #fff;
+
+        .report-table thead {
+          background: #0F172A;
         }
-        .table-proka th {
-          padding: 12px 16px;
+
+        .report-table th {
+          padding: 0.75rem 1rem;
+
+          color: #FFFFFF;
+
           text-align: left;
+
+          font-size: 0.72rem;
           font-weight: 600;
-          font-size: 0.8rem;
-          text-transform: uppercase;
+
           letter-spacing: 0.03em;
+          text-transform: uppercase;
+
           white-space: nowrap;
         }
-        .table-proka td {
-          padding: 12px 16px;
-          border-bottom: 1px solid #f0f0f0;
+
+        .report-table td {
+          padding: 0.8rem 1rem;
+
+          color: #0F172A;
+
+          border-bottom: 1px solid #E2E8F0;
+
           vertical-align: middle;
-        }
-        .table-proka tbody tr:hover {
-          background: #f8f9fc;
+          white-space: nowrap;
         }
 
-        /* ===== STATUS BADGE ===== */
-        .status-badge {
-          display: inline-block;
-          padding: 4px 12px;
-          border-radius: 30px;
-          font-size: 0.75rem;
-          font-weight: 600;
-          text-transform: capitalize;
+        .report-table tbody tr:last-child td {
+          border-bottom: none;
         }
-        .status-pending { background: #fff3cd; color: #856404; }
-        .status-confirmed { background: #cce5ff; color: #004085; }
-        .status-completed { background: #d4edda; color: #155724; }
-        .status-canceled { background: #f8d7da; color: #721c24; }
 
-        .badge-success {
-          background: #d4edda;
-          color: #155724;
-          padding: 4px 12px;
-          border-radius: 30px;
-          font-size: 0.75rem;
-          font-weight: 600;
+        .report-table tbody tr:hover {
+          background: #F8FAFC;
         }
-        .badge-warning {
-          background: #fff3cd;
-          color: #856404;
-          padding: 4px 12px;
-          border-radius: 30px;
-          font-size: 0.75rem;
+
+        .customer-name {
           font-weight: 600;
         }
 
-        /* ===== PAGINATION ===== */
+        .time-cell {
+          font-variant-numeric: tabular-nums;
+        }
+
+        .price-cell {
+          font-weight: 600;
+          font-variant-numeric: tabular-nums;
+        }
+
+        /* ================= STATUS ================= */
+
+        /*
+         * Status tidak dibuat sebagai badge besar.
+         * Hanya teks berwarna agar sesuai dengan prinsip
+         * "No fake badges".
+         */
+
+        .status-text {
+          font-size: 0.8rem;
+          font-weight: 600;
+        }
+
+        .status-pending {
+          color: #64748B;
+        }
+
+        .status-confirmed {
+          color: #0F172A;
+        }
+
+        .status-completed {
+          color: #16A34A;
+        }
+
+        .status-canceled {
+          color: #DC2626;
+        }
+
+        /* ================= PAYMENT ================= */
+
+        .payment-paid,
+        .payment-unpaid {
+          font-size: 0.8rem;
+          font-weight: 600;
+        }
+
+        .payment-paid {
+          color: #16A34A;
+        }
+
+        .payment-unpaid {
+          color: #DC2626;
+        }
+
+        /* ================= PAGINATION ================= */
+
         .pagination {
           display: flex;
-          justify-content: center;
           align-items: center;
+          justify-content: center;
           gap: 0.75rem;
-          margin-top: 2rem;
-        }
-        .page-btn {
-          padding: 0.4rem 1rem;
-          border-radius: 30px;
-          border: 1.5px solid #e5e7eb;
-          background: white;
-          color: #374151;
-          font-weight: 500;
-          cursor: pointer;
-          transition: 0.2s;
-        }
-        .page-btn:hover:not(:disabled) {
-          background: #f5f3ff;
-          border-color: #1e293b;
-        }
-        .page-btn:disabled {
-          opacity: 0.4;
-          cursor: not-allowed;
-        }
-        .page-info {
-          font-weight: 500;
-          color: #6b7280;
-          font-size: 0.9rem;
+
+          margin-top: 1.25rem;
         }
 
-        /* ===== LOADING & EMPTY ===== */
+        .page-btn {
+          height: 36px;
+
+          padding: 0 0.9rem;
+
+          border: 1px solid #E2E8F0;
+          border-radius: 8px;
+
+          background: #FFFFFF;
+          color: #0F172A;
+
+          font-size: 0.8rem;
+          font-weight: 600;
+
+          cursor: pointer;
+          transition: 0.15s ease;
+        }
+
+        .page-btn:hover:not(:disabled) {
+          border-color: #16A34A;
+          color: #16A34A;
+        }
+
+        .page-btn:disabled {
+          opacity: 0.45;
+          cursor: not-allowed;
+        }
+
+        .page-info {
+          color: #64748B;
+          font-size: 0.8rem;
+          font-weight: 500;
+        }
+
+        /* ================= LOADING ================= */
+
         .loading-state,
         .empty-state {
           display: flex;
           flex-direction: column;
           align-items: center;
           justify-content: center;
-          padding: 4rem 0;
-          color: #6b7280;
+
+          min-height: 220px;
+
+          color: #64748B;
+          font-size: 0.9rem;
         }
+
         .spinner {
-          width: 36px;
-          height: 36px;
-          border: 4px solid #f3f0ff;
-          border-top: 4px solid #1e293b;
+          width: 30px;
+          height: 30px;
+
+          margin-bottom: 0.75rem;
+
+          border: 3px solid #E2E8F0;
+          border-top-color: #16A34A;
           border-radius: 50%;
+
           animation: spin 0.8s linear infinite;
-          margin-bottom: 1rem;
         }
+
         @keyframes spin {
-          to { transform: rotate(360deg); }
+          to {
+            transform: rotate(360deg);
+          }
         }
+
+        /* ================= ALERT ================= */
 
         .alert {
           padding: 0.75rem 1rem;
-          border-radius: 8px;
+
           margin-bottom: 1rem;
-        }
-        .alert-error {
-          background: #fee2e2;
-          color: #991b1b;
-          border: 1px solid #ef4444;
+
+          border-radius: 8px;
+
+          font-size: 0.85rem;
         }
 
-        /* ===== RESPONSIVE ===== */
+        .alert-error {
+          color: #B91C1C;
+          background: #FEF2F2;
+          border: 1px solid #FECACA;
+        }
+
+        /* ================= RESPONSIVE ================= */
+
         @media (max-width: 768px) {
-          .filter-bar-proka {
-            flex-direction: column;
+          .reports-page {
+            padding: 1.25rem 1rem;
+          }
+
+          .page-title {
+            font-size: 1.6rem;
+          }
+
+          .filter-card {
             align-items: stretch;
-            gap: 0.75rem;
-            padding: 1rem;
-          }
-          .filter-group {
-            flex-wrap: wrap;
-          }
-          .stats-grid-proka {
-            grid-template-columns: 1fr 1fr;
-            gap: 0.75rem;
-          }
-          .stat-card-proka {
             flex-direction: column;
-            text-align: center;
           }
-          .stat-icon {
-            font-size: 1.3rem;
-            width: auto;
+
+          .filter-input {
+            width: 100%;
+            min-width: 0;
           }
-          .stat-value {
-            font-size: 1.1rem;
+
+          .btn-reset {
+            width: fit-content;
+          }
+
+          .summary-grid {
+            grid-template-columns: 1fr;
+          }
+
+          .table-card {
+            border-radius: 10px;
           }
         }
+
         @media (max-width: 480px) {
-          .stats-grid-proka {
-            grid-template-columns: 1fr 1fr;
+          .reports-page {
+            padding: 1rem 0.75rem;
+          }
+
+          .summary-card {
+            padding: 1rem;
+          }
+
+          .summary-value {
+            font-size: 1.3rem;
+          }
+
+          .pagination {
             gap: 0.5rem;
           }
-          .stat-card-proka {
-            padding: 0.75rem;
-          }
-          .stat-value {
-            font-size: 1rem;
+
+          .page-btn {
+            padding: 0 0.7rem;
           }
         }
       `}</style>

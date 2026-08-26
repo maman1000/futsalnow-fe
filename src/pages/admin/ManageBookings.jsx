@@ -112,7 +112,10 @@ export default function ManageBookings() {
           <select
             className="filter-select"
             value={status}
-            onChange={(e) => setStatus(e.target.value)}
+            onChange={(e) => {
+              setStatus(e.target.value);
+              setCurrentPage(1);
+            }}
           >
             <option value="">Semua</option>
             <option value="pending">Pending</option>
@@ -127,7 +130,10 @@ export default function ManageBookings() {
             type="date"
             className="filter-input"
             value={date}
-            onChange={(e) => setDate(e.target.value)}
+            onChange={(e) => {
+              setDate(e.target.value);
+              setCurrentPage(1);
+            }}
           />
         </div>
         {(status || date) && (
@@ -152,7 +158,7 @@ export default function ManageBookings() {
         </div>
       ) : bookings.length === 0 ? (
         <div className="empty-state">
-          <p>😕 Tidak ada booking yang cocok dengan filter.</p>
+          <p>Tidak ada booking yang cocok dengan filter.</p>
         </div>
       ) : (
         <>
@@ -235,7 +241,7 @@ export default function ManageBookings() {
                 onClick={(e) => e.stopPropagation()}
               >
                 <div className="modal-header">
-                  <h3>⚠️ Konfirmasi Ubah Status</h3>
+                  <h3>Konfirmasi Ubah Status</h3>
                   <button
                     className="modal-close"
                     onClick={() => setShowStatusModal(false)}
@@ -298,380 +304,520 @@ export default function ManageBookings() {
         .manage-bookings-page {
           max-width: 1200px;
           margin: 0 auto;
-          padding: 2rem 1.5rem;
+          padding: 32px 24px 48px;
+          color: #0F172A;
         }
+
+        /* =========================
+          HEADER
+        ========================= */
 
         .page-header {
-          margin-bottom: 2rem;
+          margin-bottom: 28px;
         }
+
         .page-title {
-          font-size: 2rem;
+          margin: 0 0 6px;
+          font-size: 28px;
+          line-height: 1.2;
           font-weight: 700;
-          color: #1f2937;
-          margin-bottom: 0.25rem;
+          color: #0F172A;
         }
+
         .page-subtitle {
-          color: #6b7280;
-          font-size: 1rem;
+          margin: 0;
+          color: #64748B;
+          font-size: 15px;
         }
+
+        /* =========================
+          ALERT
+        ========================= */
 
         .alert {
-          padding: 0.75rem 1rem;
-          border-radius: 14px;
-          font-size: 0.9rem;
-          margin-bottom: 1.5rem;
-          border-left: 4px solid;
-        }
-        .alert-error {
-          background: #fee2e2;
-          border-color: #dc2626;
-          color: #991b1b;
-        }
-        .alert-success {
-          background: #f0fdf4;
-          border-color: #22c55e;
-          color: #166534;
+          padding: 12px 16px;
+          margin-bottom: 20px;
+          border-radius: 8px;
+          font-size: 14px;
+          border: 1px solid transparent;
         }
 
-        /* Filter */
+        .alert-error {
+          background: #FEF2F2;
+          color: #991B1B;
+          border-color: #FECACA;
+        }
+
+        .alert-success {
+          background: #F0FDF4;
+          color: #166534;
+          border-color: #BBF7D0;
+        }
+
+        /* =========================
+          FILTER
+        ========================= */
+
         .filter-bar {
           display: flex;
           flex-wrap: wrap;
-          align-items: center;
-          gap: 1rem 1.5rem;
-          background: white;
-          padding: 1rem 1.5rem;
-          border-radius: 20px;
-          margin-bottom: 2rem;
-          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
-          border: 1px solid #f3f0ff;
+          align-items: end;
+          gap: 16px;
+          background: #FFFFFF;
+          padding: 20px;
+          border: 1px solid #E2E8F0;
+          border-radius: 12px;
+          margin-bottom: 24px;
         }
+
         .filter-group {
           display: flex;
-          align-items: center;
-          gap: 0.5rem;
+          flex-direction: column;
+          gap: 6px;
+          min-width: 180px;
         }
+
         .filter-label {
-          font-weight: 500;
-          color: #374151;
-          font-size: 0.85rem;
+          font-size: 13px;
+          font-weight: 600;
+          color: #475569;
         }
+
         .filter-select,
         .filter-input {
-          padding: 0.4rem 0.8rem;
-          border: 1.5px solid #e5e7eb;
-          border-radius: 10px;
-          font-size: 0.9rem;
-          background: #fafafa;
-          transition: 0.2s;
+          height: 40px;
+          padding: 0 12px;
+          border: 1px solid #CBD5E1;
+          border-radius: 8px;
+          background: #FFFFFF;
+          color: #0F172A;
+          font-size: 14px;
+          font-family: inherit;
+          transition: border-color 0.2s, box-shadow 0.2s;
         }
+
         .filter-select:focus,
         .filter-input:focus {
           outline: none;
-          border-color: #1e293b;
-          box-shadow: 0 0 0 3px rgba(30, 41, 59, 0.08);
-        }
-        .btn-reset {
-          padding: 0.3rem 1rem;
-          background: #f3f4f6;
-          border: none;
-          border-radius: 30px;
-          font-size: 0.8rem;
-          font-weight: 500;
-          color: #4b5563;
-          cursor: pointer;
-          transition: 0.2s;
-        }
-        .btn-reset:hover {
-          background: #e5e7eb;
+          border-color: #16A34A;
+          box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.10);
         }
 
-        /* Loading & Empty */
+        .btn-reset {
+          height: 40px;
+          padding: 0 16px;
+          border: 1px solid #CBD5E1;
+          border-radius: 8px;
+          background: #FFFFFF;
+          color: #475569;
+          font-size: 14px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+
+        .btn-reset:hover {
+          background: #F8FAFC;
+          border-color: #94A3B8;
+        }
+
+        /* =========================
+          LOADING / EMPTY
+        ========================= */
+
         .loading-state,
         .empty-state {
+          min-height: 280px;
           display: flex;
           flex-direction: column;
           align-items: center;
           justify-content: center;
-          padding: 4rem 0;
-          color: #6b7280;
+          color: #64748B;
+          background: #FFFFFF;
+          border: 1px solid #E2E8F0;
+          border-radius: 12px;
         }
+
+        .empty-state p {
+          margin: 0;
+          font-size: 14px;
+        }
+
         .spinner {
-          width: 40px;
-          height: 40px;
-          border: 4px solid #f3f0ff;
-          border-top: 4px solid #1e293b;
+          width: 34px;
+          height: 34px;
+          border: 3px solid #DCFCE7;
+          border-top-color: #16A34A;
           border-radius: 50%;
           animation: spin 0.8s linear infinite;
-          margin-bottom: 1rem;
+          margin-bottom: 12px;
         }
+
         @keyframes spin {
           to {
             transform: rotate(360deg);
           }
         }
 
-        /* ===== TABEL PROKA ===== */
+        /* =========================
+          TABLE
+        ========================= */
+
         .table-wrapper {
           overflow-x: auto;
-          background: white;
-          border-radius: 16px;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
-          border: 1px solid #f0f0f0;
+          background: #FFFFFF;
+          border: 1px solid #E2E8F0;
+          border-radius: 12px;
         }
+
         .table-proka {
           width: 100%;
+          min-width: 950px;
           border-collapse: collapse;
-          font-size: 0.9rem;
+          font-size: 14px;
         }
+
         .table-proka thead {
-          background: #1a1a2e;
-          color: #fff;
+          background: #F8FAFC;
         }
+
         .table-proka th {
-          padding: 12px 16px;
+          padding: 13px 16px;
           text-align: left;
+          color: #475569;
+          font-size: 12px;
           font-weight: 600;
-          font-size: 0.8rem;
           text-transform: uppercase;
-          letter-spacing: 0.03em;
+          letter-spacing: 0.025em;
+          border-bottom: 1px solid #E2E8F0;
           white-space: nowrap;
         }
+
         .table-proka td {
-          padding: 12px 16px;
-          border-bottom: 1px solid #f0f0f0;
+          padding: 14px 16px;
+          color: #334155;
+          border-bottom: 1px solid #F1F5F9;
           vertical-align: middle;
+          white-space: nowrap;
         }
+
+        .table-proka tbody tr:last-child td {
+          border-bottom: none;
+        }
+
         .table-proka tbody tr:hover {
-          background: #f8f9fc;
+          background: #F8FAFC;
         }
+
+        /* =========================
+          STATUS
+        ========================= */
+
+        .status-badge {
+          display: inline-flex;
+          align-items: center;
+          padding: 4px 9px;
+          border-radius: 6px;
+          font-size: 12px;
+          font-weight: 600;
+          line-height: 1;
+        }
+
+        .status-pending {
+          background: #FEF3C7;
+          color: #92400E;
+        }
+
+        .status-confirmed {
+          background: #DCFCE7;
+          color: #166534;
+        }
+
+        .status-completed {
+          background: #F0FDF4;
+          color: #15803D;
+        }
+
+        .status-canceled {
+          background: #FEE2E2;
+          color: #991B1B;
+        }
+
+        /* =========================
+          ACTIONS
+        ========================= */
 
         .table-actions {
           display: flex;
-          gap: 6px;
-          flex-wrap: wrap;
+          align-items: center;
+          gap: 8px;
         }
 
-        /* ===== STATUS BADGE ===== */
-        .status-badge {
-          display: inline-block;
-          padding: 4px 12px;
-          border-radius: 30px;
-          font-size: 0.75rem;
+        .btn-confirm,
+        .btn-cancel,
+        .btn-complete {
+          height: 34px;
+          padding: 0 12px;
+          border-radius: 8px;
+          font-size: 12px;
           font-weight: 600;
-          text-transform: capitalize;
-        }
-        .status-pending {
-          background: #fef3c7;
-          color: #856404;
-        }
-        .status-confirmed {
-          background: #cce5ff;
-          color: #004085;
-        }
-        .status-completed {
-          background: #d4edda;
-          color: #155724;
-        }
-        .status-canceled {
-          background: #f8d7da;
-          color: #721c24;
-        }
-
-        /* ===== TOMBOL AKSI ===== */
-        .btn-confirm {
-          padding: 0.3rem 1.2rem;
-          background: #1e293b;
-          color: white;
-          border: none;
-          border-radius: 30px;
-          font-weight: 600;
-          font-size: 0.8rem;
           cursor: pointer;
-          transition: 0.2s;
+          transition: all 0.2s;
+          white-space: nowrap;
         }
+
+        .btn-confirm {
+          background: #16A34A;
+          color: #FFFFFF;
+          border: 1px solid #16A34A;
+        }
+
         .btn-confirm:hover {
-          background: #0f172a;
-          transform: scale(1.04);
+          background: #15803D;
+          border-color: #15803D;
         }
 
         .btn-cancel {
-          padding: 0.3rem 1.2rem;
-          background: #fee2e2;
-          color: #991b1b;
-          border: none;
-          border-radius: 30px;
-          font-weight: 600;
-          font-size: 0.8rem;
-          cursor: pointer;
-          transition: 0.2s;
+          background: #FFFFFF;
+          color: #B91C1C;
+          border: 1px solid #FCA5A5;
         }
+
         .btn-cancel:hover {
-          background: #fecaca;
-          transform: scale(1.04);
+          background: #FEF2F2;
         }
 
         .btn-complete {
-          padding: 0.3rem 1.2rem;
-          background: #2563eb;
-          color: white;
-          border: none;
-          border-radius: 30px;
-          font-weight: 600;
-          font-size: 0.8rem;
-          cursor: pointer;
-          transition: 0.2s;
-        }
-        .btn-complete:hover {
-          background: #1d4ed8;
-          transform: scale(1.04);
+          background: #15803D;
+          color: #FFFFFF;
+          border: 1px solid #15803D;
         }
 
-        /* ===== MODAL ===== */
+        .btn-complete:hover {
+          background: #166534;
+          border-color: #166534;
+        }
+
+        /* =========================
+          MODAL
+        ========================= */
+
         .modal-overlay {
           position: fixed;
           inset: 0;
-          background: rgba(0, 0, 0, 0.4);
-          backdrop-filter: blur(4px);
+          z-index: 999;
           display: flex;
           align-items: center;
           justify-content: center;
-          z-index: 999;
-          padding: 1rem;
+          padding: 20px;
+          background: rgba(15, 23, 42, 0.45);
         }
+
         .modal-content {
-          background: white;
-          border-radius: 24px;
-          max-width: 420px;
           width: 100%;
-          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+          max-width: 420px;
+          background: #FFFFFF;
+          border: 1px solid #E2E8F0;
+          border-radius: 12px;
           overflow: hidden;
-          animation: modalIn 0.25s ease;
+          box-shadow: 0 20px 40px rgba(15, 23, 42, 0.15);
+          animation: modalIn 0.2s ease;
         }
+
         @keyframes modalIn {
           from {
             opacity: 0;
-            transform: scale(0.95) translateY(20px);
+            transform: translateY(8px);
           }
+
           to {
             opacity: 1;
-            transform: scale(1) translateY(0);
+            transform: translateY(0);
           }
         }
+
         .modal-header {
           display: flex;
-          justify-content: space-between;
           align-items: center;
-          padding: 1.2rem 1.5rem;
-          border-bottom: 1px solid #f0f0f0;
-          background: #fafafa;
-        }
-        .modal-header h3 {
-          font-size: 1.1rem;
-          font-weight: 600;
-          color: #1f2937;
-          margin: 0;
-        }
-        .modal-close {
-          background: none;
-          border: none;
-          font-size: 1.2rem;
-          cursor: pointer;
-          color: #6b7280;
-          padding: 0.2rem 0.5rem;
-          border-radius: 6px;
-          transition: 0.2s;
-        }
-        .modal-close:hover {
-          background: #f3f4f6;
-        }
-        .modal-body {
-          padding: 1.5rem;
-        }
-        .modal-sub {
-          color: #6b7280;
-          font-size: 0.9rem;
-          margin-bottom: 1.2rem;
-        }
-        .modal-actions {
-          display: flex;
-          gap: 0.75rem;
-          margin-top: 1.5rem;
-        }
-        .modal-actions button {
-          flex: 1;
-          padding: 0.6rem;
-          border-radius: 30px;
-          font-weight: 600;
-          font-size: 0.9rem;
-          border: none;
-          cursor: pointer;
-          transition: 0.2s;
-        }
-        .btn-cancel-modal {
-          background: #f3f4f6;
-          color: #374151;
-        }
-        .btn-cancel-modal:hover {
-          background: #e5e7eb;
-        }
-        .btn-confirm-modal {
-          background: #1e293b;
-          color: white;
-        }
-        .btn-confirm-modal:hover {
-          background: #0f172a;
-          transform: scale(1.02);
+          justify-content: space-between;
+          padding: 16px 20px;
+          border-bottom: 1px solid #E2E8F0;
         }
 
-        /* ===== PAGINATION ===== */
+        .modal-header h3 {
+          margin: 0;
+          font-size: 17px;
+          font-weight: 600;
+          color: #0F172A;
+        }
+
+        .modal-close {
+          width: 32px;
+          height: 32px;
+          border: none;
+          border-radius: 6px;
+          background: transparent;
+          color: #64748B;
+          font-size: 18px;
+          cursor: pointer;
+        }
+
+        .modal-close:hover {
+          background: #F1F5F9;
+          color: #0F172A;
+        }
+
+        .modal-body {
+          padding: 20px;
+        }
+
+        .modal-sub {
+          margin: 0;
+          color: #475569;
+          font-size: 14px;
+          line-height: 1.6;
+        }
+
+        .modal-sub strong {
+          color: #16A34A;
+          font-weight: 600;
+        }
+
+        .modal-actions {
+          display: flex;
+          gap: 10px;
+          margin-top: 24px;
+        }
+
+        .modal-actions button {
+          flex: 1;
+          height: 40px;
+          border-radius: 8px;
+          font-size: 14px;
+          font-weight: 600;
+          cursor: pointer;
+        }
+
+        .btn-cancel-modal {
+          border: 1px solid #CBD5E1;
+          background: #FFFFFF;
+          color: #475569;
+        }
+
+        .btn-cancel-modal:hover {
+          background: #F8FAFC;
+        }
+
+        .btn-confirm-modal {
+          border: 1px solid #16A34A;
+          background: #16A34A;
+          color: #FFFFFF;
+        }
+
+        .btn-confirm-modal:hover {
+          background: #15803D;
+        }
+
+        /* =========================
+          PAGINATION
+        ========================= */
+
         .pagination {
           display: flex;
           justify-content: center;
           align-items: center;
-          gap: 0.75rem;
-          margin-top: 2rem;
-        }
-        .page-btn {
-          padding: 0.4rem 1rem;
-          border-radius: 30px;
-          border: 1.5px solid #e5e7eb;
-          background: white;
-          color: #374151;
-          font-weight: 500;
-          cursor: pointer;
-          transition: 0.2s;
-        }
-        .page-btn:hover:not(:disabled) {
-          background: #f5f3ff;
-          border-color: #1e293b;
-        }
-        .page-btn:disabled {
-          opacity: 0.4;
-          cursor: not-allowed;
-        }
-        .page-info {
-          font-weight: 500;
-          color: #6b7280;
-          font-size: 0.9rem;
+          gap: 12px;
+          margin-top: 24px;
         }
 
-        @media (max-width: 640px) {
+        .page-btn {
+          height: 36px;
+          padding: 0 14px;
+          border: 1px solid #CBD5E1;
+          border-radius: 8px;
+          background: #FFFFFF;
+          color: #475569;
+          font-size: 13px;
+          font-weight: 500;
+          cursor: pointer;
+        }
+
+        .page-btn:hover:not(:disabled) {
+          border-color: #16A34A;
+          color: #15803D;
+          background: #F0FDF4;
+        }
+
+        .page-btn:disabled {
+          opacity: 0.45;
+          cursor: not-allowed;
+        }
+
+        .page-info {
+          color: #64748B;
+          font-size: 13px;
+          font-weight: 500;
+        }
+
+        /* =========================
+          RESPONSIVE
+        ========================= */
+
+        @media (max-width: 768px) {
+          .manage-bookings-page {
+            padding: 24px 16px 40px;
+          }
+
+          .page-title {
+            font-size: 24px;
+          }
+
           .filter-bar {
-            flex-direction: column;
             align-items: stretch;
-            gap: 0.75rem;
-            padding: 1rem;
+            flex-direction: column;
+            gap: 14px;
+            padding: 16px;
           }
+
           .filter-group {
-            flex-wrap: wrap;
+            min-width: 0;
           }
+
+          .filter-select,
+          .filter-input,
+          .btn-reset {
+            width: 100%;
+          }
+
+          .table-wrapper {
+            border-radius: 10px;
+          }
+
           .table-proka {
-            font-size: 0.8rem;
+            min-width: 900px;
           }
-          .table-proka th,
-          .table-proka td {
-            padding: 8px 10px;
+        }
+
+        @media (max-width: 480px) {
+          .manage-bookings-page {
+            padding: 20px 12px 32px;
+          }
+
+          .page-title {
+            font-size: 22px;
+          }
+
+          .page-subtitle {
+            font-size: 14px;
+          }
+
+          .pagination {
+            gap: 8px;
+          }
+
+          .page-btn {
+            padding: 0 10px;
+            font-size: 12px;
           }
         }
       `}</style>
