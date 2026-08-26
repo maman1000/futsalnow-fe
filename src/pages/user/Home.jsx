@@ -650,6 +650,36 @@ export default function Home() {
           line-height: 1.6;
         }
 
+        .cta-section {
+          padding: 40px 0;
+        }
+        .cta-box {
+          background: #0f172a;
+          padding: 40px 32px;
+          border-radius: 16px;
+          text-align: center;
+        }
+        .cta-title {
+          color: #ffffff;
+          font-size: 28px;
+          font-weight: 700;
+          margin: 0 0 8px;
+        }
+        .cta-desc {
+          color: #94a3b8;
+          font-size: 16px;
+          margin: 0 0 24px;
+        }
+        .cta-btn {
+          display: inline-block;
+          background: #16a34a;
+          color: #ffffff;
+          padding: 14px 32px;
+          border-radius: 8px;
+          font-weight: 600;
+          text-decoration: none;
+        }
+
         @media (max-width: 900px) {
           .recommend-grid {
             grid-template-columns: repeat(2, 1fr);
@@ -679,6 +709,10 @@ export default function Home() {
           max-width: 100%;
           height: 240px;
         }
+
+         .features-grid {
+          grid-template-columns: repeat(2, 1fr); /* Tablet: jadi 2 kolom */
+        }
       }
 
       @media (max-width: 480px) {
@@ -696,7 +730,11 @@ export default function Home() {
 
         .recommend-grid {
           grid-template-columns: 1fr;
-  }
+        }
+
+        .features-grid {
+          grid-template-columns: 1fr; /* HP: jadi 1 kolom penuh */
+        }
       }
 
       `}</style>
