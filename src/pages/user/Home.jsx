@@ -744,14 +744,21 @@ export default function Home() {
             margin-left: 0;
           }
 
-          /* Cegah gambar meluber */
+          /* Cegah gambar meluber */          
           .hero-image-wrapper {
+            display: flex;
+            justify-content: center !important; /* timpa flex-end dari desktop */
             overflow: hidden;
-          }
+            width: 100%;
+          }    
+
           .hero-image {
             max-width: 100%;
             height: auto;
             aspect-ratio: 16/10;
+            object-fit: cover;
+            border-radius: 12px;
+            margin: 0 auto; /* pengaman tambahan */
           }
 
           .hero-title {
