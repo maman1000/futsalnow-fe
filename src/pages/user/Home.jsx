@@ -798,6 +798,17 @@ export default function Home() {
           }
         }
 
+        @media (max-width: 390px) {
+        .search-input {
+          padding: 8px 4px;   /* sebelumnya 10px 8px */
+          font-size: 13px;    /* sebelumnya 14px */
+        }
+        .search-btn {
+          padding: 8px 10px;  /* sebelumnya 10px 14px */
+          font-size: 13px;    /* sebelumnya 14px */
+        }
+      }
+
       `}</style>
     </div>
   );
