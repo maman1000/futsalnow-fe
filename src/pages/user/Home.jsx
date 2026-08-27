@@ -798,7 +798,7 @@ export default function Home() {
           }
         }
 
-        @media (max-width: 390px) {
+        @media (max-width: 400px) {
         .search-input {
           padding: 8px 4px;   /* sebelumnya 10px 8px */
           font-size: 13px;    /* sebelumnya 14px */
