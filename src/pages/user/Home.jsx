@@ -816,6 +816,30 @@ export default function Home() {
         }
       }
 
+      /* Untuk semua layar dengan lebar <= 360px */
+      @media (max-width: 360px) {
+        .hero-image-wrapper {
+          display: flex;
+          justify-content: center !important; /* paksa tengah */
+          width: 100%;
+          overflow: hidden;
+        }
+
+        .hero-image {
+          max-width: 100%;
+          height: auto;
+          aspect-ratio: 16/10;
+          object-fit: cover;
+          border-radius: 12px;
+          margin: 0 auto; /* tambahan pengaman */
+        }
+
+        /* Opsional: kecilkan padding hero-content agar tidak terlalu sempit */
+        .hero-content {
+          padding: 0 0.75rem !important;
+        }
+      }
+
       `}</style>
     </div>
   );
