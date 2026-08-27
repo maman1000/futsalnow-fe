@@ -764,6 +764,16 @@ export default function Home() {
             max-width: 90%; /* agar tidak terlalu melebar */
           }
 
+          .hero-section {
+            grid-template-columns: 1fr;
+            gap: 32px;
+            padding: 40px 0;
+          }
+
+          .hero-content {
+            max-width: none;
+          }
+
           .recommend-grid {
             grid-template-columns: 1fr;
           }
