@@ -715,29 +715,47 @@ export default function Home() {
         }
       }
 
-        @media (max-width: 480px) {
+      @media (max-width: 480px) {
+          /* Pastikan container utama tidak overflow */
+          .home-page {
+            overflow-x: hidden;
+            padding: 0 1.5rem !important;
+          }
+
+          /* Beri padding internal yang sama pada hero-content */
+          .hero-content {
+            padding: 0 1.5rem !important;
+            margin: 0 auto;
+            width: 100%;
+            max-width: 100%;
+            text-align: center;
+            box-sizing: border-box;
+          }
+
+          /* Hilangkan semua margin/padding asimetris pada search bar */
+          .search-bar {
+            margin: 0 auto;
+            padding: 4px 8px;
+            box-sizing: border-box;
+          }
+
+          /* Pastikan ikon tidak punya margin kiri */
+          .search-icon {
+            margin-left: 0;
+          }
+
+          /* Cegah gambar meluber */
+          .hero-image-wrapper {
+            overflow: hidden;
+          }
+          .hero-image {
+            max-width: 100%;
+            height: auto;
+            aspect-ratio: 16/10;
+          }
+
           .hero-title {
             font-size: 30px;
-          }
-
-          /* Perbaiki hero-content agar terpusat dan memiliki padding simetris */
-          .hero-content {
-            margin: 0 auto;
-            width: 100%;
-            max-width: 100%;
-            padding: 0; /* hilangkan internal padding yang asimetris */
-            text-align: center;
-          }
-
-          /* Search bar full dan simetris */
-          .search-bar {
-            width: 100%;
-            max-width: 100%;
-            margin: 0 auto;
-            padding: 4px 8px; /* tambahkan padding kiri/kanan */
-            display: flex;
-            flex-wrap: nowrap;
-            box-sizing: border-box;
           }
 
           .search-input {
@@ -754,14 +772,9 @@ export default function Home() {
             flex-shrink: 0;
           }
 
-          /* Hilangkan margin kiri ikon agar search bar simetris */
-          .search-icon {
-            margin-left: 0;
-          }
-
           .hero-desc {
             margin: 12px auto 24px;
-            max-width: 90%; /* agar tidak terlalu melebar */
+            max-width: 90%;
           }
 
           .hero-section {
@@ -770,9 +783,11 @@ export default function Home() {
             padding: 40px 0;
           }
 
+          /* HAPUS aturan ini karena sudah diatur di atas:
           .hero-content {
             max-width: none;
           }
+          */
 
           .recommend-grid {
             grid-template-columns: 1fr;
@@ -782,6 +797,7 @@ export default function Home() {
             grid-template-columns: 1fr;
           }
         }
+
       `}</style>
     </div>
   );
