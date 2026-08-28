@@ -9,25 +9,20 @@ const formatRupiah = (n) =>
     minimumFractionDigits: 0,
   }).format(n ?? 0);
 
-// const fieldImages = [
-//   "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=400&h=300&fit=crop",
-//   "https://images.unsplash.com/photo-1560272564-c83b66b1ad12?w=400&h=300&fit=crop",
-//   "https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=400&h=300&fit=crop",
-// ];
-
 const fieldImages = [
-  "/images/futsal-A.jpg",
-  "/images/futsal-B.jpg",
-  "/images/futsal-C.jpg",
+  "/images/progresif-futsal.jpg",
+  "/images/groove-futsal.jpg",
+  "/images/green-futsal.jpg",
 ];
 
-const getBadge = (index) => {
-  const badges = [
-    { label: "Populer", className: "badge-popular" },
-    { label: "Harga Spesial", className: "badge-special" },
-    { label: "Premium", className: "badge-premium" },
-  ];
-  return badges[index % badges.length];
+const getBadge = (service) => {
+  if (service.price_per_hour >= 250000) {
+    return { label: "Premium", className: "badge-premium" };
+  }
+  if (service.price_per_hour >= 200000) {
+    return { label: "Harga Spesial", className: "badge-special" };
+  }
+  return null; // Tidak ada badge untuk lapangan standar
 };
 
 const categories = ["Semua", "Premium", "Standar"];
@@ -78,8 +73,8 @@ export default function Services() {
       ? services
       : services.filter((s) =>
           activeFilter === "Premium"
-            ? s.price_per_hour >= 200000
-            : s.price_per_hour < 200000,
+            ? s.price_per_hour >= 250000
+            : s.price_per_hour < 250000,
         );
 
   return (
@@ -116,7 +111,7 @@ export default function Services() {
       ) : (
         <div className="services-grid">
           {filteredServices.map((service, index) => {
-            const badge = getBadge(index);
+            const badge = getBadge(service);
             const imageIndex = index % fieldImages.length;
             const isFeatured = index === 0;
 
@@ -134,15 +129,17 @@ export default function Services() {
                     className="service-image"
                     loading="lazy"
                   />
-                  <span className={`service-badge ${badge.className}`}>
-                    {badge.label}
-                  </span>
+                  {badge && ( // ✅ tambahan pengecekan
+                    <span className={`service-badge ${badge.className}`}>
+                      {badge.label}
+                    </span>
+                  )}
                 </div>
 
                 {/* KONTEN */}
                 <div className="service-body">
                   <h3 className="service-name">{service.name}</h3>
-                  <p className="service-location">📍 Bandung Selatan</p>
+                  <p className="service-location">📍 Bandung</p>
                   <p className="service-desc">
                     {service.description ||
                       "Lapangan futsal berkualitas dengan fasilitas lengkap."}

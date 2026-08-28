@@ -16,24 +16,27 @@ const formatRupiah = (n) =>
     minimumFractionDigits: 0,
   }).format(n ?? 0);
 
-// const fieldImages = [
-//   "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=400&h=300&fit=crop",
-//   "https://images.unsplash.com/photo-1560272564-c83b66b1ad12?w=400&h=300&fit=crop",
-//   "https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=400&h=300&fit=crop",
-// ];
-
 const fieldImages = [
-  "/images/futsal-A.jpg",
-  "/images/futsal-B.jpg",
-  "/images/futsal-C.jpg",
+  "/images/progresif-futsal.jpg",
+  "/images/groove-futsal.jpg",
+  "/images/green-futsal.jpg",
 ];
+
+const getBadge = (service) => {
+  if (service.price_per_hour >= 250000) {
+    return { label: "Premium", className: "badge-premium" };
+  }
+  if (service.price_per_hour >= 200000) {
+    return { label: "Harga Spesial", className: "badge-special" };
+  }
+  return null;
+};
 
 export default function Home() {
   const { user } = useAuth();
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [activeFilter, setActiveFilter] = useState("Semua");
 
   useEffect(() => {
     const fetchServices = async () => {
@@ -50,11 +53,6 @@ export default function Home() {
   }, []);
 
   const filteredServices = services
-    .filter((s) => {
-      if (activeFilter === "Populer") return s.price_per_hour >= 200000;
-      if (activeFilter === "Premium") return s.price_per_hour >= 250000;
-      return true;
-    })
     .filter((s) => s.name.toLowerCase().includes(searchTerm.toLowerCase()))
     .slice(0, 3);
 
@@ -79,132 +77,6 @@ export default function Home() {
   return (
     <div className="home-page page-content">
       {/* ===== HERO ===== */}
-      {/* <section className="hero-section">
-        <div className="hero-blur-1"></div>
-        <div className="hero-blur-2"></div>
-
-        <div className="hero-content">
-          <h1 className="hero-title">
-            Cari Lapangan Futsal <br />
-            <span className="hero-highlight">Langsung Booking</span>
-          </h1>
-          <p className="hero-desc">Yuk, cari lapangan futsal favoritmu!</p>
-
-          <div className="search-bar">
-            <MagnifyingGlassIcon className="search-icon" />
-            <input
-              type="text"
-              className="search-input"
-              placeholder="Cari lapangan..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            <Link to="/services" className="search-btn">
-              Cari
-            </Link>
-          </div>
-
-          <div className="quick-filter">
-            {["Semua", "Populer", "Premium"].map((filter) => (
-              <button
-                key={filter}
-                className={`filter-chip ${activeFilter === filter ? "active" : ""}`}
-                onClick={() => setActiveFilter(filter)}
-              >
-                {filter}
-              </button>
-            ))}
-          </div>
-
-          {!user && (
-            <div className="hero-auth">
-              <span>Baru di sini? </span>
-              <Link to="/register" className="hero-register-link">
-                Daftar sekarang →
-              </Link>
-            </div>
-          )}
-        </div>
-
-        <div className="hero-image-wrapper">
-          <div className="hero-image">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 200 200"
-              className="hero-illustration"
-              width="240"
-              height="240"
-            >
-              <rect
-                x="10"
-                y="20"
-                width="180"
-                height="160"
-                rx="8"
-                fill="#2d3748"
-              />
-              <rect
-                x="20"
-                y="30"
-                width="160"
-                height="140"
-                rx="4"
-                fill="#38a169"
-              />
-              <line
-                x1="20"
-                y1="100"
-                x2="180"
-                y2="100"
-                stroke="white"
-                strokeWidth="2"
-              />
-              <circle
-                cx="100"
-                cy="100"
-                r="16"
-                fill="none"
-                stroke="white"
-                strokeWidth="2"
-              />
-              <rect
-                x="14"
-                y="60"
-                width="8"
-                height="40"
-                rx="2"
-                fill="white"
-                opacity="0.7"
-              />
-              <rect
-                x="178"
-                y="60"
-                width="8"
-                height="40"
-                rx="2"
-                fill="white"
-                opacity="0.7"
-              />
-              <circle cx="100" cy="100" r="12" fill="white" />
-              <circle cx="100" cy="100" r="6" fill="#2d3748" />
-              <circle cx="100" cy="100" r="2" fill="white" />
-              <path
-                d="M20 50 L180 50"
-                stroke="white"
-                strokeWidth="1"
-                opacity="0.3"
-              />
-              <path
-                d="M20 150 L180 150"
-                stroke="white"
-                strokeWidth="1"
-                opacity="0.3"
-              />
-            </svg>
-          </div>
-        </div>
-      </section> */}
-
       <section className="hero-section">
         <div className="hero-content">
           <p className="hero-eyebrow">FUTSALNOW</p>
@@ -274,6 +146,7 @@ export default function Home() {
           <div className="recommend-grid">
             {filteredServices.map((service, index) => {
               const imgIndex = index % fieldImages.length;
+              const badge = getBadge(service);
               return (
                 <div key={service.id} className="rec-card">
                   <div className="rec-image-wrapper">
@@ -283,6 +156,11 @@ export default function Home() {
                       className="rec-image"
                       loading="lazy"
                     />
+                    {badge && (
+                      <span className={`service-badge ${badge.className}`}>
+                        {badge.label}
+                      </span>
+                    )}
                   </div>
 
                   <div className="rec-body">
@@ -493,10 +371,30 @@ export default function Home() {
         }
 
         .rec-image-wrapper {
+          position: relative;
           height: 180px;
 
           overflow: hidden;
           background: #f1f5f9;
+        }
+
+        .service-badge {
+          position: absolute;
+          top: 12px;
+          left: 12px;
+          padding: 4px 9px;
+          border-radius: 6px;
+          color: #ffffff;
+          font-size: 0.72rem;
+          font-weight: 600;
+        }
+
+        .badge-special {
+          background: #2563eb;
+        }
+
+        .badge-premium {
+          background: #0d9488;
         }
 
         .rec-image {
